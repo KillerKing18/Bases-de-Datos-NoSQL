@@ -1,0 +1,22 @@
+#### práctica 6, NoSQL
+
+db.lugares.drop()
+db.lugares.insert({nombre:"Informática-UCM", tipo:"Facultad", pais:"España",                    
+                    posicion: {type:"Point", coordinates:[-3.7353797,40.450305]}})
+db.lugares.insert({nombre:"Metropolitano", tipo:"metro", pais:"España", 
+                    posicion: {type:"Point", coordinates:[-3.7202654,40.4465915]}})
+db.lugares.insert({nombre:"Ciudad Universitaria", tipo:"metro", pais:"España", 
+                  posicion: {type:"Point", coordinates:[-3.7289768,40.4435602]}})
+db.lugares.insert({nombre:"Pabellón de Plata", tipo:"templo", pais:"Japón", 
+                   posicion: {type:"Point", coordinates:[135.7982058,35.0270213]}})
+
+### OJO: solo insertar este cuando se haya completado				   
+db.lugares.insert({nombre:"María Zambrano", tipo:"biblioteca", pais:"España", 
+                   posicion: {type:"Point", coordinates:[????long,????lat]}})
+
+#####################
+## Pregunta 4
+
+use pract2d
+db.plano.drop()
+for (var i=0; i<500; i++) { for (var j=0; j<=i; j++)   	{ db.plano.insert({desc:"("+i+","+j+")", punto:[i,j]});}}

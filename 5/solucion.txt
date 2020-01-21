@@ -1,0 +1,36 @@
+﻿Bases de datos NoSQL - práctica 5
+
+//Nombre1: Mario Bocos Corredor
+//Nombre2: Álvaro López García
+
+//Observaciones:
+
+//P1 Consulta:
+db.tweet.aggregate([{$group:{_id:"$user.screen", total: {$sum:1}}}, {$match: {total:{$gte:10}}}])
+
+//P2 Consulta:
+db.tweet.aggregate([{$group:{_id:"$user.screen", total: {$sum:1}}}, {$match: {total:{$gte:10}}}, {$sort:{"total":-1}}, {$limit:1}])
+
+//P3 Consulta:
+
+
+//P4 Consulta:
+db.tweet.aggregate([{$group:{_id:{usuario:"$user.screen", verified:"$user.verified"}, total: {$sum:1}}}, {$match: {total:{$gte:10}}}])
+
+//P5 Consulta:
+db.tweet.aggregate([{$group:{_id:"$user.screen", fecha: {$min:"$created_at"}}},{$sort: {_id:1}}])
+
+//P6 Consulta:
+
+
+//P7 Consulta:
+db.tweet.aggregate([{$unwind:"$mentions"}, {$group:{_id:"$mentions", total: {$sum:1}}}, {$sort:{total:-1}}])
+
+//P8 Consulta:
+db.user.aggregate([{$group:{_id:null, zonas_horarias: {$addToSet:"$time_zone"}}}])
+
+//P9 Consulta:
+
+
+//P10: Consulta
+db.tweet.aggregate([{$group:{_id:{day:{$dayOfMonth:"$created_at"},hour:{$hour:"$created_at"}}, total:{$sum:1}}}])

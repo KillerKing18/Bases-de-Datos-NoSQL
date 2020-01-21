@@ -1,0 +1,51 @@
+﻿//Bases de datos NoSQL - práctica 6
+
+//Nombre1: Mario Bocos Corredor
+//Nombre2: Álvaro López García
+
+//Observaciones:
+
+//P1a Insert:
+db.lugares.insert({nombre:"María Zambrano", tipo:"biblioteca", pais:"España", 
+                   posicion: {type:"Point", coordinates:[-3.733164,40.449153]}})
+//P1b Indice:
+db.lugares.createIndex({posicion:"2dsphere"})
+{
+	"createdCollectionAutomatically" : false,
+	"numIndexesBefore" : 1,
+	"numIndexesAfter" : 2,
+	"ok" : 1
+}
+
+//P2 Consulta:
+db.lugares.find({'posicion':{$near:{$geometry:{type:'Point', coordinates:[-3.7251149, 40.4381963]}, $minDistance: 1500}}}, {_id:false, nombre:true, tipo:true})
+
+//P3a Creación de índices:
+db.plano.createIndex({punto:1}, "ipunto")
+db.plano.createIndex({desc:1}, "idesc")
+//P3b Comentario sobre dif de tamaños:
+Al ser punto una clave que contiene un array, al crear el índice se crea una entrada para cada valor del array
+
+//P4 Consulta:
+db.plano.find({"punto.0":{$gt : 480}}).count()
+
+//P5a Índice (Sí/No): Sí
+
+//P5b ¿Cuál? (si sí): ipunto
+
+//P6 Consulta:
+db.plano.find({punto:{$geoWithin:{$polygon:[[0,0], [3,0], [3,3], [0,3]]}}})
+
+//P7 Creación de índice: db.plano.createIndex({punto:"2d"})
+
+//P8a ¿Sé puede crear el índice?(Sí/No): No
+
+//P8b ¿Por qué? (una frase): Porque varios puntos se salen del intervalo (-180, 180)
+
+//P9a ¿Sé puede crear el índice para mejorar?(Sí/No): No
+
+//P9b Si la respuesta es sí, copiar la instrucción para crearlo. Si es no, escribir una frase explicando por qué.
+No, porque cada uno de los miembros de la pareja de coordenadas está incluído en la nueva estructura de índices por separado y no podemos hacer distinciones entre la coordenada 'x' y la 'y' a la hora de comparar con algún valor en concreto.
+
+//P10 Fragmento de código:
+db.lugares.aggregate([{$geoNear:{near:{type:"Point", coordinates: [-3.7251149, 40.4381963]}, distanceField: "distance", spherical:true}}, {$match: {"nombre": "María Zambrano"}}, {$project: {_id:0, distance:1}}])

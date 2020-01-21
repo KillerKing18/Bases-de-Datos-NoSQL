@@ -1,0 +1,33 @@
+Bases de datos NoSQL - práctica 4
+
+#Nombre1: Álvaro López García 
+#Nombre2: Mario Bocos Corredor
+
+#Observaciones:
+
+#P1 Consulta:
+db.user.aggregate([{$group:{_id:"$verified", total:{$sum:1}}}])
+
+#P2 Consulta:
+db.user.aggregate([{$group:{_id:"$verified", media:{$avg:"$followers"}}}])
+
+#P3 Consulta:
+db.user.aggregate([{$group:{_id:null, media: {$avg:"$followers"}}}])
+
+#P4 Consulta:
+db.user.aggregate([{$group:{_id:"$tweets.original", menciones: {$avg:"$mentions"}}}, {$sort:{"_id":1}}])
+
+#P5 Consulta:
+db.user.find({"location":{$ne:""}}).count()
+
+#P6 Consulta:
+db.user.aggregate([{$group:{_id:{$year:"$created_at"}, total: {$sum:1}, media: {$avg:"$tweets.all"}}}, {$sort:{"_id":1}}])
+
+#P7 Consulta:
+db.user.aggregate([{$group:{_id:{mes:{$month:"$created_at"}, año:{$year:"$created_at"}}, total: {$sum:1}, media: {$avg:"$tweets.all"}}}, {$sort:{"_id.año":1, "_id.mes":1}}])
+
+#P8 Consulta:
+db.user.aggregate([{$bucket: {groupBy: "$tweets.total", boundaries: [0, 25, 50, 100, 200], default: "Other", output: {"media": {$avg: "$opinion.hpref"}}}}])
+
+#P9 Consulta:
+db.user.aggregate([{$group:{_id:"$tweets.total", media:{$cond: {if: { $eq: ["opinion.hp", 0] }, then: 1, else: { $divide: ["$opinion.tp", "$opinion.hp"]}}}}}, {$sort:{"_id":1}}])

@@ -1,0 +1,38 @@
+﻿
+// Práctica 2 - NoSQL
+// Nombre 1: Mario Bocos Corredor	
+// Nombre 2: Álvaro López García
+// Nombre 3:
+// Instrucciones: poner solo codigo ejecutable.
+// observaciones:
+
+// P1 (copiar consulta en la linea de abajo)
+db.libros.find({$and:[{"opiniones":{$exists:false}}, {"precio":{$gt:12}}]}, {titulo:true, precio:true, _id: false})
+
+// P2 (copiar consulta en la linea de abajo)
+db.libros.find({"precio":{$type:"string"}}).count()
+
+// P3 (copiar consulta en la linea de abajo)
+db.libros.find({"opiniones.usuario":{$nin:["bertoldo"]}}, {titulo:true, _id:false})
+
+// P4 (copiar consulta en la linea de abajo)
+db.libros.find({"genero":{$all:["romance","terror"]}}, {titulo:true, _id:false})
+
+// P5 (copiar consulta en la linea de abajo)
+db.libros.find({$and:[{"genero":{$nin: ["terror"]}}, {"genero":{$in:["romance"]}}]}).count()
+
+// P6 (copiar consulta en la linea de abajo)
+db.libros.find({"opiniones.0.puntos":{"$gt":5}}).count()
+
+// P7 (copiar consulta en la linea de abajo)
+db.libros.find({$or:[{"opiniones.usuario":{$in:["herminia"]}}, {precio:{$lt:10}}]}).count()
+
+// P8 (copiar consulta en la linea de abajo)
+db.libros.find({"opiniones.2":{$exists:true}}, {titulo:true, "opiniones.2":true, _id:false})
+
+// P9 (copiar consulta en la linea de abajo)
+db.libros.find({"genero":{$in:["romance"]}}, {titulo:1, opiniones:{ $elemMatch:{usuario: "bertoldo", puntos:{$gte:8}}}, _id:0})
+
+// P10 (copiar consulta en la linea de abajo)
+db.libros.find({$where:"this.edicion.actual.year - this.edicion.primera >= 10"}, {_id:0, titulo:1})
+

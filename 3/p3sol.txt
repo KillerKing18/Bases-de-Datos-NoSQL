@@ -1,0 +1,35 @@
+﻿// Práctica 3 - NoSQL
+// Nombre 1: Mario Bocos Corredor
+// Nombre 2: Álvaro López García
+// Instrucciones: poner solo codigo ejecutable.
+// observaciones:
+
+// P1 (copiar consulta en la linea de abajo)
+db.log.update({País:"Francia"}, {$set:{País:"España"}}, {multi:true})
+
+// P2 (copiar consulta en la linea de abajo)
+db.log.update({_id:"Sinda"}, {$push:{actions:{$each:[{action:"copy file", timestamp:"2018-05-24 15:03:21", duration:8, success:true}], $position:0}}})
+
+// P3 (copiar consulta en la linea de abajo)
+db.log.update({_id:"Herminia"}, {$set:{"actions.2.duration":4, "actions.2.success":true}})
+
+// P4 (copiar consulta en la linea de abajo)
+db.log.update({_id:"Herminia"}, {$inc:{"actions.2.duration":2}})
+
+// P5 (copiar consulta en la linea de abajo)
+db.log.update({_id:"Bertoldo"}, {$addToSet:{IP:"112.56.2.67"}})
+
+// P6 (copiar consulta en la linea de abajo)
+db.log.update({actions: {$elemMatch: {duration:{$gt:10}, success:false}}}, {$set:{suspicius:true}}, {multi:true})
+
+// P7 (copiar consulta en la linea de abajo)
+db.log.update({"País":{$ne:"Alemania"}}, {$unset:{"suspicius":true}}, {multi:true})
+
+// P8 (copiar consulta en la linea de abajo)
+db.log.remove({_id:"Fabricio", actions: {$elemMatch: {success: {$exists:false}}}})
+
+// P9 (copiar consulta en la linea de abajo)
+db.pru.find({a: {$not:{$elemMatch:{$nin:[1,4,5,2,3,5,1,4,8]}}}})
+
+// P10 (copiar consulta en la linea de abajo)
+db.log.update({_id:"Aniceto"}, {$set: {"País":"Italia"}, $push:{actions:{$each:[]}}}, {upsert:true})

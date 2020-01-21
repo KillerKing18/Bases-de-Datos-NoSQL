@@ -1,0 +1,42 @@
+﻿
+//Práctica 7 -  NoSQL - Solución
+//Nombre 1: Mario Bocos Corredor
+//Nombre 2: Álvaro López García
+//Nombre 3
+//Observaciones:
+
+// Nota: no escribir código tras las // sino en la línea de abajo
+
+//Respuestas
+
+//P1#
+//Índice:
+db.tweet.createIndex({text:"text"})
+//Consulta: 
+db.tweet.find({$text:{$search:"USA"}}).count()
+
+
+//P2#Consulta: 
+db.tweet.find({$text:{$search:"USA WIN"}}).count()
+
+//P3#Consulta: 
+db.tweet.find({$text:{$search:"-USA WIN"}}).count()
+
+//P4#Consulta:
+db.tweet.find({$text:{$search:"lie"}},{text:true, score:true, _id:false,score:{$meta:"textScore"}}).sort({score:{$meta:"textScore"}}).pretty()
+//5#:
+//a)
+//b)
+
+
+//6#Consulta:
+db.tweet.aggregate([{$match:{$text:{$search:"lie"}}}, {$group:{_id:"$user.screen", count:{$sum:1}}}, {$sort:{count:-1}}])
+
+//P7#
+//a)tiempo:26; totalDeClaves:0; totalDocumentosExaminados:17834
+//b)db.tweet.createIndex({tlabel:-1, created_at:-1})
+//c)tiempo:6; totalDeClaves:5381; totalDocumentosExaminados:0
+
+//P8#
+//Consulta:
+db.prueba.find({a:2,b:1}).hint({b:1})
