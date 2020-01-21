@@ -1,0 +1,40 @@
+
+// Práctica 1 - NoSQL
+// Nombre 1: Mario Bocos Corredor
+// Nombre 2: Álvaro López García
+// Instrucciones: poner solo codigo ejecutable.
+// observaciones:
+
+// P1 (copiar consulta en la linea de abajo)
+db.comments.find().limit(1).skip(100)
+
+// P2 (copiar consulta en la linea de abajo)
+db.comments.find({'content.authorNick':'UROBOROS3'}).count()
+
+// P3 (copiar consulta en la linea de abajo)
+db.comments.find({'_id':{ "collection" : "238449142","id" : "811961925"}}, {'content.authorNick':1, '_id':0})
+
+// P4 (copiar consulta en la linea de abajo)
+db.comments.find({'content.likedBy':'Don_Fulgencio'}).count()
+
+// P5 (copiar consulta en la linea de abajo)
+db.user.drop();
+db.comments.find({'content.authorNick':'La.tralla'}).forEach(function(doc){db.user.insert(doc);});
+db.user.count()
+
+// P6 (copiar consulta en la linea de abajo)
+db.comments.distinct('content.authorNick', {'content.comunidad':'1'}).length * 100 / db.comments.distinct('content.authorNick').length
+
+// P7 (copiar consulta en la linea de abajo)
+db.comments.distinct('content.authorNick')
+
+// P8 (copiar consulta en la linea de abajo)
+db.pru.drop();
+db.pru.insert([{a:1,b:1},{a:1,b:2},{a:2,b:1},{a:2,b:2},{a:3,b:1},{a:3,b:2}]);
+db.pru.find({},{'_id':0}).sort({b:1, a:-1})
+
+// P9 (copiar consulta en la linea de abajo)
+db.pru.drop();
+db.pru.insert({a:[10,20,30,40,50]});
+db.pru.find({},{'_id':0,'a':{$slice:-2}})
+
