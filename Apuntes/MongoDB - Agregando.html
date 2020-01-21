@@ -1,0 +1,2216 @@
+
+<!-- saved from url=(0056)http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>MongoDB - Agregando</title>
+      
+
+    <link rel="stylesheet" href="./MongoDB - Agregando_files/style.css" type="text/css">
+    
+<link id="avast_os_ext_custom_font" href="chrome-extension://eofcbnmajmjmplflapaojjnihcjkigck/common/ui/fonts/fonts.css" rel="stylesheet" type="text/css"></head>
+
+<body style="background-color: rgb(255, 255, 255);" link="#000099">
+<b><font size="-1"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/index.html"><img src="./MongoDB - Agregando_files/nosqllogo.png" width="60"> Bases de Datos NoSQL - RafaC - 2016/2017</a></font>
+</b> <br>
+En las bases de datos es muy importante disponer de consultas que permitan combinar diferentes elementos; por ejemplo dada la colección de ventas en una tienda calcular el total vendido; o incluso los subtotales logrados por cada vendedor.<br>
+<div id="toc"><h1 class="nopad">Índice</h1><div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Estructura">Estructura</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Ejemplo">$group</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Funciones%20de%20agregaci%C3%B3n">Funciones de agregación</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Funciones%20de%20agregaci%C3%B3n-$sum">$sum</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Funciones%20de%20agregaci%C3%B3n-$avg">$avg</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Funciones%20de%20agregaci%C3%B3n-$addToSet">$addToSet</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Funciones%20de%20agregaci%C3%B3n-$push">$push</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Funciones%20de%20agregaci%C3%B3n-$unwind">$unwind</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Funciones%20de%20agregaci%C3%B3n-$max,%20$min">$max, $min</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Funciones%20de%20agregaci%C3%B3n-$first,%20$last">$first, $last</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#bucket">$bucket y $bucketAuto</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#facet">$facet</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#x$project">$project</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#x$match">$match</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#x$sort">$sort</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#x$skip,%20$limit">$skip, $limit</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Etapas">Etapas</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#x$out">$out</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#x$lookup">$lookup</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Map%20Reduce">Map Reduce</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Vistas">Vistas</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/Agregando.html#Enlaces">Enlaces</a></div>
+</div>
+A esta misma familia de consultas también pertenece la obtención de un valor que se calcula a partir de toda la colección, por ejemplo el máximo valor de una clave o la media de todos los valores.<br>
+<br>
+<br>
+<h1 id="toc0"><a name="Estructura"></a>Estructura</h1>
+ <br>
+La agregación en MongoDB sigue una estructura tipo "pipeline": diferentes etapas, donde cada una toma la salida de la anterior.<br>
+<br>
+<img src="https://gpd.sip.ucm.es/rafa/docencia/images/aggregationfwk.jpg" alt="external image aggregationfwk.jpg" title="external image aggregationfwk.jpg"><br>
+<br>
+Los elementos de la "tubería" se incluyen en un array y se ejecutarán por orden. Cada elemento puede repetirse y el orden puede variar.<br>
+<br>
+<ul><li>$project: Su función es "recolocar" el documento. Selecciona las claves que se usarán, y puede "elevar" claves que están en subdocumentos al nivel superior. Tras un paso $project habrá tantos documentos como inicialmente; pero con un formato que puede haber variado. (1:1)</li><li>$match: Filtra documentos, dejando solo los que vamos a utilizar. (n:1)</li><li>$group: Realiza la agregación (n:1)</li><li>$sort: Ordena. 1:1</li><li>$skip: Saltarse algunos a elementos n:1</li><li>$limit: Número de elementos máximo. n:1</li><li>$unwind: "aplana" datos de arrays, produciendo tantos elementos como elementos tenga el array. 1:n</li><li>$out: crea una colección nueva a partir de los datos. 1:1</li><li>$redact: Seguridad. Impide que algunos usuarios vean algunos documentos. n:1</li><li>$geonear: Se utiliza para búsquedas por posición (ver índices geoespaciales). n:1</li><li>$sample: permite elegir al azar unos cuantos documentos a modo de muestra. n:1</li><li>$lookup: join the varias colecciones</li></ul><br>
+<h1 id="toc1"><a name="Ejemplo"></a>Ejemplo</h1>
+ <br>
+Vamos a usar los siguientes datos para nuestro ejemplo:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">use</span> running
+db.<span class="me1">sesiones</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Bertoldo"</span><span class="sy0">,</span> mes<span class="sy0">:</span><span class="st0">"Marzo"</span><span class="sy0">,</span> distKm<span class="sy0">:</span><span class="nu0">6</span><span class="sy0">,</span> tiempoMin<span class="sy0">:</span><span class="nu0">42</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">sesiones</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Herminia"</span><span class="sy0">,</span> mes<span class="sy0">:</span><span class="st0">"Marzo"</span><span class="sy0">,</span> distKm<span class="sy0">:</span><span class="nu0">10</span><span class="sy0">,</span> tiempoMin<span class="sy0">:</span><span class="nu0">60</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">sesiones</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Bertoldo"</span><span class="sy0">,</span> mes<span class="sy0">:</span><span class="st0">"Marzo"</span><span class="sy0">,</span> distKm<span class="sy0">:</span><span class="nu0">2</span><span class="sy0">,</span> tiempoMin<span class="sy0">:</span><span class="nu0">12</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">sesiones</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Herminia"</span><span class="sy0">,</span> mes<span class="sy0">:</span><span class="st0">"Marzo"</span><span class="sy0">,</span> distKm<span class="sy0">:</span><span class="nu0">10</span><span class="sy0">,</span> tiempoMin<span class="sy0">:</span><span class="nu0">61</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">sesiones</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Bertoldo"</span><span class="sy0">,</span> mes<span class="sy0">:</span><span class="st0">"Abril"</span><span class="sy0">,</span> distKm<span class="sy0">:</span><span class="nu0">5</span><span class="sy0">,</span> tiempoMin<span class="sy0">:</span><span class="nu0">33</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">sesiones</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Herminia"</span><span class="sy0">,</span> mes<span class="sy0">:</span><span class="st0">"Abril"</span><span class="sy0">,</span> distKm<span class="sy0">:</span><span class="nu0">42</span><span class="sy0">,</span> tiempoMin<span class="sy0">:</span><span class="nu0">285</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">sesiones</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Aniceto"</span><span class="sy0">,</span> mes<span class="sy0">:</span><span class="st0">"Abril"</span><span class="sy0">,</span> distKm<span class="sy0">:</span><span class="nu0">5</span><span class="sy0">,</span> tiempoMin<span class="sy0">:</span><span class="nu0">33</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+Supongamos que queremos saber el número de sesiones que ha realizado cada persona:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>                                  <span class="co1">// aggregate significa que vamos a agrupar</span>
+                      <span class="br0">[</span>                                 <span class="co1">// lista de operaciones, a realizar en secuencia</span>
+                       <span class="br0">{</span>$group<span class="sy0">:</span>                         <span class="co1">// en este caso solo una operación, agrupar</span>
+                               <span class="br0">{</span> _id<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="sy0">,</span>         <span class="co1">// agrupamos por nombre</span>
+                                 num_sesiones<span class="sy0">:</span>          <span class="co1">// nueva clave, num_sesiones</span>
+                                              <span class="br0">{</span>$sum<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span>  <span class="co1">// cuenta el num.elementos en el grupo</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span>
+                       <span class="br0">]</span>
+                     <span class="br0">)</span></pre>
+
+<br>
+Se obtiene el resultado:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span><span class="sy0">,</span> <span class="st0">"num_sesiones"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"num_sesiones"</span> <span class="sy0">:</span> <span class="nu0">3</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span><span class="sy0">,</span> <span class="st0">"num_sesiones"</span> <span class="sy0">:</span> <span class="nu0">3</span> <span class="br0">}</span></pre>
+
+<br>
+<hr>
+<ul class="quotelist"><li><strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>Consideramos el código:</li><li>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"> db.<span class="me1">coord</span>.<span class="me1">drop</span><span class="br0">(</span><span class="br0">)</span>
+ <span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span><span class="nu0">5</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span> <span class="kw1">for</span><span class="br0">(</span>j<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> j<span class="sy0">&lt;</span><span class="nu0">4</span><span class="sy0">;</span> j<span class="sy0">++</span><span class="br0">)</span><span class="br0">{</span>db.<span class="me1">coord</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span>i<span class="sy0">,</span>y<span class="sy0">:</span>j<span class="sy0">+</span>i<span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span><span class="br0">}</span> <span class="br0">}</span></pre>
+
+</li></ul><br>
+<ul class="quotelist"><li>¿Cuántos elementos mostrará en pantalla la siguiente consulta de agregación?</li></ul>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">coord</span>.<span class="me1">aggregate</span><span class="br0">(</span><span class="br0">[</span> <span class="br0">{</span>$group<span class="sy0">:</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="st0">'$x'</span><span class="br0">}</span><span class="br0">}</span> <span class="br0">]</span><span class="br0">)</span></pre>
+
+<hr>
+<br>
+También podemos agrupar por nombre y mes:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+<span class="br0">[</span>
+<span class="br0">{</span>$group<span class="sy0">:</span>
+<span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="sy0">,</span>
+mes<span class="sy0">:</span> <span class="st0">"$mes"</span><span class="br0">}</span><span class="sy0">,</span>
+num_sesiones<span class="sy0">:</span> <span class="br0">{</span>$sum<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span>
+<span class="br0">}</span>
+<span class="br0">}</span>
+<span class="br0">]</span>
+<span class="br0">)</span></pre>
+
+<br>
+<br>
+<hr>
+<ul class="quotelist"><li><strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>Consideramos el código:</li><li>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">coord</span>.<span class="me1">drop</span><span class="br0">(</span><span class="br0">)</span>
+<span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span><span class="nu0">5</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span> <span class="kw1">for</span><span class="br0">(</span>j<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> j<span class="sy0">&lt;</span><span class="nu0">4</span><span class="sy0">;</span> j<span class="sy0">++</span><span class="br0">)</span><span class="br0">{</span>db.<span class="me1">coord</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span>i<span class="sy0">,</span>y<span class="sy0">:</span>j<span class="sy0">+</span>i<span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span><span class="br0">}</span> <span class="br0">}</span></pre>
+
+</li></ul><br>
+<ul class="quotelist"><li>¿Cuántos elementos mostrará en pantalla la siguiente consulta de agregación?</li><li>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">coord</span>.<span class="me1">aggregate</span><span class="br0">(</span><span class="br0">[</span> <span class="br0">{</span>$group<span class="sy0">:</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="br0">{</span>lax<span class="sy0">:</span><span class="st0">'$x'</span><span class="sy0">,</span> la<span class="sy0">:</span><span class="st0">'$y'</span><span class="br0">}</span><span class="br0">}</span><span class="br0">}</span> <span class="br0">]</span><span class="br0">)</span></pre>
+
+</li></ul><br>
+<hr>
+<br>
+<h1 id="toc2"><a name="Funciones de agregación"></a>Funciones de agregación</h1>
+ <br>
+Ya hemos visto una función de agregación, $sum, pero hay muchas otras:<br>
+<br>
+<ul><li>$sum: suma (o incrementa)</li><li>$avg : calcula la media</li><li>$min: mínimo de los valores</li><li>$max: máximo</li><li>$push: Mete en un array un valor determinado</li><li>$addToSet: Mete en un array los valore que digamos, pero solo una vez</li><li>$first: obtiene el primer elemento del grupo, a menudo junto con sort</li><li>$last: obtiene el último elemento, a menudo junto con sort</li></ul><br>
+Vamos a verlas una a una:<br>
+<br>
+<h2 id="toc3"><a name="Funciones de agregación-$sum"></a>$sum</h2>
+ <br>
+Ya la hemos visto como función para "contar" usando $sum:1, pero su propósito original es sumar:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+<span class="br0">[</span>
+<span class="br0">{</span>$group<span class="sy0">:</span>
+<span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="br0">}</span><span class="sy0">,</span>
+num_km<span class="sy0">:</span> <span class="br0">{</span>$sum<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span>
+<span class="br0">}</span>
+<span class="br0">}</span>
+<span class="br0">]</span>
+<span class="br0">)</span>
+&nbsp;
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"num_km"</span> <span class="sy0">:</span> <span class="nu0">5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"num_km"</span> <span class="sy0">:</span> <span class="nu0">62</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"num_km"</span> <span class="sy0">:</span> <span class="nu0">13</span> <span class="br0">}</span>
+&nbsp;</pre>
+
+Tenemos el total de kilómetros que ha corrido cada persona.<br>
+<br>
+<br>
+<h2 id="toc4"><a name="Funciones de agregación-$avg"></a>$avg</h2>
+ <br>
+Calcula la media. Por ejemplo: kilómetros que corre cada uno de media al mes<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+<span class="br0">[</span>
+<span class="br0">{</span>$group<span class="sy0">:</span>
+<span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="sy0">,</span>
+mes<span class="sy0">:</span> <span class="st0">"$mes"</span><span class="br0">}</span><span class="sy0">,</span>
+media<span class="sy0">:</span> <span class="br0">{</span>$avg<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span>
+<span class="br0">}</span>
+<span class="br0">}</span>
+<span class="br0">]</span>
+<span class="br0">)</span></pre>
+
+<br>
+Resultado:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span><span class="sy0">,</span> <span class="st0">"mes"</span> <span class="sy0">:</span> <span class="st0">"Abril"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"mes"</span> <span class="sy0">:</span> <span class="st0">"Abril"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">42</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"mes"</span> <span class="sy0">:</span> <span class="st0">"Marzo"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">10</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span><span class="sy0">,</span> <span class="st0">"mes"</span> <span class="sy0">:</span> <span class="st0">"Abril"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span><span class="sy0">,</span> <span class="st0">"mes"</span> <span class="sy0">:</span> <span class="st0">"Marzo"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">4</span> <span class="br0">}</span></pre>
+
+<br>
+<hr>
+<ul class="quotelist"><li><strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta difícil. </span></strong> ¿Cómo calcular el número medio de sesiones por persona al mes? (es decir, se cuenta el número de sesiones por persona y mes y a continuación se hace la media de este dato)</li></ul><hr>
+<br>
+<h2 id="toc5"><a name="Funciones de agregación-$addToSet"></a>$addToSet</h2>
+ <br>
+$addToSet crea arrays agrupando elementos.<br>
+<br>
+Ejemplo: Supongamos que queremos saber qué distancias ha corrido cada persona.<br>
+Agrupamos por el nombre y "coleccionamos" las distancias distintas<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+                      <span class="br0">[</span>
+                       <span class="br0">{</span>$group<span class="sy0">:</span>
+                               <span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="br0">}</span><span class="sy0">,</span>
+                                 distancias<span class="sy0">:</span> <span class="br0">{</span>$addToSet<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span>
+                       <span class="br0">]</span>
+                     <span class="br0">)</span></pre>
+
+El resultado:<br>
+<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"distancias"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">5</span> <span class="br0">]</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"distancias"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">42</span><span class="sy0">,</span> <span class="nu0">10</span> <span class="br0">]</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"distancias"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">5</span><span class="sy0">,</span> <span class="nu0">2</span><span class="sy0">,</span> <span class="nu0">6</span> <span class="br0">]</span> <span class="br0">}</span>
+&nbsp;</pre>
+
+<h2 id="toc6"><a name="Funciones de agregación-$push"></a>$push</h2>
+ <br>
+Análogo a $addToSet pero admite repeticiones.<br>
+<br>
+Ejemplo, queremos saber en cada mes qué distancias se han hecho en alguna sesión. Si una distancia se ha corrido varias veces en ese mes debe aparecer varias veces:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+                      <span class="br0">[</span>
+                       <span class="br0">{</span>$group<span class="sy0">:</span>
+                               <span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>mes<span class="sy0">:</span><span class="st0">"$mes"</span><span class="br0">}</span><span class="sy0">,</span>
+                                 distancias<span class="sy0">:</span><span class="br0">{</span>$push<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span>
+                       <span class="br0">]</span>
+                     <span class="br0">)</span></pre>
+
+El resultado:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"mes"</span> <span class="sy0">:</span> <span class="st0">"Abril"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"distancias"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">5</span><span class="sy0">,</span> <span class="nu0">42</span><span class="sy0">,</span> <span class="nu0">5</span> <span class="br0">]</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"mes"</span> <span class="sy0">:</span> <span class="st0">"Marzo"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"distancias"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">6</span><span class="sy0">,</span> <span class="nu0">10</span><span class="sy0">,</span> <span class="nu0">2</span><span class="sy0">,</span> <span class="nu0">10</span> <span class="br0">]</span> <span class="br0">}</span></pre>
+
+<h2 id="toc7"><a name="Funciones de agregación-$unwind"></a>$unwind</h2>
+ <br>
+Es el reverso de $push; cuando tenemos documentos que contienen un array y queremos agrupar por valores del array, a veces conviene eliminar los<br>
+arrays y convertirlos en múltiples documentos.<br>
+<br>
+<img src="https://gpd.sip.ucm.es/rafa/docencia/images/relation.jpeg" alt="external image relation.jpeg" title="external image relation.jpeg"><br>
+<br>
+En realidad estamos "normalizando" (primera forma normal).<br>
+<br>
+Ejemplo:<br>
+<br>
+Volvemos al ejemplo de personas con aficiones:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">gustos</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Bertoldo"</span><span class="sy0">,</span>  aficiones<span class="sy0">:</span><span class="br0">[</span><span class="st0">"siesta"</span><span class="sy0">,</span><span class="st0">"cine"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">gustos</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Herminia"</span><span class="sy0">,</span> aficiones<span class="sy0">:</span><span class="br0">[</span><span class="st0">"correr"</span><span class="sy0">,</span><span class="st0">"cine"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">gustos</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Aniceta"</span><span class="sy0">,</span> aficiones<span class="sy0">:</span><span class="br0">[</span><span class="st0">"viajar"</span><span class="sy0">,</span><span class="st0">"cine"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">gustos</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Godofredo"</span><span class="sy0">,</span>  aficiones<span class="sy0">:</span><span class="br0">[</span><span class="st0">"correr"</span><span class="sy0">,</span><span class="st0">"montaña"</span><span class="sy0">,</span> <span class="st0">"cine"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+Queremos saber el número de personas con el que cuenta cada afición. ¿Cómo hacerlo?<br>
+<br>
+Para ello el primer paso es hacer $unwind:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">gustos</span>.<span class="me1">aggregate</span><span class="br0">(</span><span class="br0">[</span>   <span class="br0">{</span>$unwind<span class="sy0">:</span><span class="st0">'$aficiones'</span><span class="br0">}</span>   <span class="br0">]</span> <span class="br0">)</span>
+&nbsp;</pre>
+
+que da como resultado:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56b513cc5df4eba0d451ffaa"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="st0">"siesta"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56b513cc5df4eba0d451ffaa"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="st0">"cine"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56b513cc5df4eba0d451ffab"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="st0">"correr"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56b513cc5df4eba0d451ffab"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="st0">"cine"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56b513cc5df4eba0d451ffac"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceta"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="st0">"viajar"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56b513cc5df4eba0d451ffac"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceta"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="st0">"cine"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56b513cd5df4eba0d451ffad"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Godofredo"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="st0">"correr"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56b513cd5df4eba0d451ffad"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Godofredo"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="st0">"montaña"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56b513cd5df4eba0d451ffad"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Godofredo"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="st0">"cine"</span> <span class="br0">}</span></pre>
+
+Ahora es fácil pensar en la siguiente etapa: agrupar por aficiones<br>
+<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">gustos</span>.<span class="me1">aggregate</span><span class="br0">(</span><span class="br0">[</span>
+                     <span class="br0">{</span>$unwind<span class="sy0">:</span><span class="st0">'$aficiones'</span><span class="br0">}</span><span class="sy0">,</span>
+                     <span class="br0">{</span>$group<span class="sy0">:</span>
+                          <span class="br0">{</span>_id<span class="sy0">:</span><span class="st0">'$aficiones'</span><span class="sy0">,</span>
+                           total<span class="sy0">:</span><span class="br0">{</span>$sum<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span> <span class="br0">}</span> <span class="br0">}</span>
+                    <span class="br0">]</span> <span class="br0">)</span></pre>
+
+Muestra:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"montaña"</span><span class="sy0">,</span> <span class="st0">"total"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"viajar"</span><span class="sy0">,</span> <span class="st0">"total"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"correr"</span><span class="sy0">,</span> <span class="st0">"total"</span> <span class="sy0">:</span> <span class="nu0">2</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"cine"</span><span class="sy0">,</span> <span class="st0">"total"</span> <span class="sy0">:</span> <span class="nu0">4</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"siesta"</span><span class="sy0">,</span> <span class="st0">"total"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span>
+&nbsp;</pre>
+
+<br>
+<br>
+<h2 id="toc8"><a name="Funciones de agregación-$max, $min"></a>$max, $min</h2>
+ <br>
+El mayor, menor valor en el grupo.<br>
+<br>
+Ejemplo:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+                      <span class="br0">[</span>
+                       <span class="br0">{</span>$group<span class="sy0">:</span>
+                               <span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="br0">}</span><span class="sy0">,</span>
+                                 maxdist<span class="sy0">:</span><span class="br0">{</span>$max<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span><span class="sy0">,</span>
+                                 mindist<span class="sy0">:</span><span class="br0">{</span>$min<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span>
+                       <span class="br0">]</span>
+                     <span class="br0">)</span></pre>
+
+Resultado:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"maxdist"</span> <span class="sy0">:</span> <span class="nu0">5</span><span class="sy0">,</span> <span class="st0">"mindist"</span> <span class="sy0">:</span> <span class="nu0">5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"maxdist"</span> <span class="sy0">:</span> <span class="nu0">42</span><span class="sy0">,</span> <span class="st0">"mindist"</span> <span class="sy0">:</span> <span class="nu0">10</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"maxdist"</span> <span class="sy0">:</span> <span class="nu0">6</span><span class="sy0">,</span> <span class="st0">"mindist"</span> <span class="sy0">:</span> <span class="nu0">2</span> <span class="br0">}</span>
+&nbsp;</pre>
+
+<br>
+<h2 id="toc9"><a name="Funciones de agregación-$first, $last"></a>$first, $last</h2>
+ <br>
+Devuelven el primero, respectivamente el último elemento de un grupo.<br>
+<br>
+<br>
+<hr>
+<ul class="quotelist"><li><strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>Supongamos la colección:</li></ul>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> <span class="sy0">&gt;</span> db.<span class="me1">fun</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">21</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">54</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">52</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">17</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">4</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">22</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">5</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">5</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">6</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">87</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">7</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">97</span> <span class="br0">}</span></pre>
+
+<ul class="quotelist"><li>¿Cuál será el resultado de c tras la siguiente consulta?</li></ul><br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">fun</span>.<span class="me1">aggregate</span><span class="br0">(</span><span class="br0">[</span>
+<span class="br0">{</span>$match<span class="sy0">:</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">0</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span>
+<span class="br0">{</span>$sort<span class="sy0">:</span><span class="br0">{</span>c<span class="sy0">:-</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span>
+<span class="br0">{</span>$group<span class="sy0">:</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="st0">"$a"</span><span class="sy0">,</span> c<span class="sy0">:</span><span class="br0">{</span>$first<span class="sy0">:</span><span class="st0">"$c"</span><span class="br0">}</span><span class="br0">}</span><span class="br0">}</span>
+<span class="br0">]</span><span class="br0">)</span></pre>
+
+Check: número x el número del revés<br>
+<hr>
+<br>
+<br>
+
+<h1 id="toc10"><a name="bucket"></a>$bucket y $bucketAuto</h1>
+ <br>
+El propósito de estas etapas es agrupar según intervalos de una clave. La estructura de $bucket:
+
+<pre>{
+  $bucket: {
+      groupBy: expression,
+      boundaries: [ lowerbound1, lowerbound2, ... ],
+      default: literal,
+      output: {
+         output1: { &lt;$accumulator expression&gt; },
+         ...
+         outputN: { &lt;$accumulator expression&gt; }
+      }
+   }
+}
+</pre>
+
+Significado:
+<ul>
+<li>La parte groupBy corresponde al _id the $group, es decir especifica la clave por la que queremos agrupar. Debe ser un valor que admita comparaciones ($leq,...)
+</li><li> boundaries es un array que indica los límites por los que agrupar. Por ejemplo [0,20,40] crea dos intervalos: [0,20), [20,40)
+</li><li> default: Nombre del grupo en el que se incluirán los valores que no encajen. Opcional.  
+</li><li> output: claves a incluir en la salida, si no se incluye ninguna al menos se incluirá por defecto <i>count:{$sum:1}</i>
+</li></ul>
+
+Ejemplo: <br> Queremos saber cuántas sesiones hay de distancias cortas (0 a 5 km), medias,  (5 a 10), largas (10  a 40) o muy largas (más de 40).
+
+<pre>db.sesiones.aggregate( [
+  {
+    $bucket: {
+      groupBy: "$distKm",
+      boundaries: [ 0, 5, 10, 40 ],
+      default: "Gran distancia"
+    }
+  }
+] )
+</pre>
+Salida:
+<div class="shell-wrap">
+  <p class="shell-top-bar">mongodb</p>
+  <ul class="shell-body">
+    <li>{ "_id" : 0, "count" : 1 }</li>
+    <li>{ "_id" : 5, "count" : 3 }</li>
+    <li>{ "_id" : 10, "count" : 2 }</li>
+    <li>{ "_id" : "Gran distancia", "count" : 1 }</li>
+  </ul>
+</div>
+<br>
+Supongamos ahora que queremos además saber quiénes han recorrido estas distancias:
+<pre>db.sesiones.aggregate( [
+  {
+    $bucket: {
+      groupBy: "$distKm",
+      boundaries: [ 0, 5, 10, 40 ],
+      default: "Gran distancia",
+      output: {
+        "count": { $sum: 1 },
+        "quienes" : { $addToSet: "$nombre" }
+      }
+    }
+  }
+] )
+</pre>
+Salida:
+<div class="shell-wrap" width="600px">
+  <p class="shell-top-bar">mongodb</p>
+  <ul class="shell-body">
+    <li>{ "_id" : 0, "count" : 1, "quienes" : [ "Bertoldo" ] }</li>
+    <li>{ "_id" : 5, "count" : 3, "quienes" : [ "Aniceto", "Bertoldo" ] }</li>
+    <li>{ "_id" : 10, "count" : 2, "quienes" : [ "Herminia" ] }</li>
+    <li>{ "_id" : "Gran distancia", "count" : 1, "quienes" : [ "Herminia" ] }</li>
+  </ul>
+</div>
+<br>
+<a href="https://docs.mongodb.com/manual/reference/operator/aggregation/bucketAuto/#pipe._S_bucketAuto">$bucketAuto</a> tiene el mismo significado, pero en este caso no decimos los intervalos; solo cuántos queremos obtener.
+Sintaxis:
+
+<pre>{
+  $bucketAuto: {
+      groupBy: expression,
+      buckets: number,
+      output: {
+         output1: { &lt;$accumulator expression&gt; },
+         ...
+      }
+      granularity: string
+  }
+}
+</pre>
+
+La clave buckets indica el número de intervalos que usará. El sistema intenta repartirlas de forma más o menos homogénea.
+
+Ejemplo: 
+<pre>db.sesiones.aggregate( [
+   {
+     $bucketAuto: {
+       groupBy: "$tiempoMin",
+       buckets: 4
+     }
+   }
+ ] )
+</pre>
+Salida:
+<div class="shell-wrap">
+  <p class="shell-top-bar">mongodb</p>
+  <ul class="shell-body">
+    <li>{ "_id" : { "min" : 12, "max" : 42 }, "count" : 3 }</li>
+    <li>{ "_id" : { "min" : 42, "max" : 61 }, "count" : 2 }</li>
+    <li>{ "_id" : { "min" : 61, "max" : 285 }, "count" : 2 }</li>
+  </ul>
+</div>
+<br>
+El reparto intenta ser homogéneo, pero lo mejor es definir la granularidad de forma específica (consultar la documentación).
+<hr>
+<br>
+<br>
+
+<h1 id="toc10"><a name="facet"></a>$facet</h1>
+ 
+$facet es complejo y potente, permite agrupar varios pipeline de agregación.
+
+
+Por ejemplo, supongamos que queremos agrupar las sesiones de entrenamiento por intervalos de tiempo y aparte por intervalos de kilómetros. Una solución podría usar dos aggregate, cada una con su correspondiente $bucket. Sin embargo, podemos hacerlo todo a la vez:
+<pre>db.sesiones.aggregate([ 
+  {$facet: 
+    {
+     "distancia": [
+      { $bucket:  {
+      groupBy: "$distKm",
+      boundaries: [ 0, 5, 10, 40 ],
+      default: "Gran distancia",
+      output: {
+        "count": { $sum: 1 },
+        "quienes" : { $addToSet: "$nombre" }
+      }
+    }
+    }],
+    "tiempo": [
+      { $bucket:  {
+      groupBy: "$tiempoMin",
+      boundaries: [ 0, 30, 60 ],
+      default: "Más de una hora",
+      output: {
+        "count": { $sum: 1 },
+        "quienes" : { $addToSet: "$nombre" }
+      }
+    }
+    }] 
+  
+  }
+ }
+])
+</pre>
+
+Resultado:
+<pre>{
+	"distancia" : [
+		{
+			"_id" : 0,
+			"count" : 1,
+			"quienes" : [
+				"Bertoldo"
+			]
+		},
+		{
+			"_id" : 5,
+			"count" : 3,
+			"quienes" : [
+				"Aniceto",
+				"Bertoldo"
+			]
+		},
+		{
+			"_id" : 10,
+			"count" : 2,
+			"quienes" : [
+				"Herminia"
+			]
+		},
+		{
+			"_id" : "Gran distancia",
+			"count" : 1,
+			"quienes" : [
+				"Herminia"
+			]
+		}
+	],
+	"tiempo" : [
+		{
+			"_id" : 0,
+			"count" : 1,
+			"quienes" : [
+				"Bertoldo"
+			]
+		},
+		{
+			"_id" : 30,
+			"count" : 3,
+			"quienes" : [
+				"Aniceto",
+				"Bertoldo"
+			]
+		},
+		{
+			"_id" : "Más de una hora",
+			"count" : 3,
+			"quienes" : [
+				"Herminia"
+			]
+		}
+	]
+}
+</pre>
+<br>
+
+<hr>
+<br>
+<br>
+<h1 id="toc10"><a name="x$project"></a>$project</h1>
+ <br>
+Project está al nivel de $group o de $bucket, es decir es una de las etapas permitidas en aggregate. Resulta muy útil para cambiar nombres de claves, introducir nuevas claves, etc. Es decir, su objetivo es "preparar" la agregación. En ocasiones se utiliza para crear nuevas colecciones.<br>
+Se suele usar con los siguientes operadores:<br>
+<br>
+<ul><li><a class="wiki_link_ext" href="https://docs.mongodb.org/manual/reference/operator/aggregation-boolean/" rel="nofollow">booleanos</a>: $and, $or, $not</li><li><a class="wiki_link_ext" href="https://docs.mongodb.org/manual/reference/operator/aggregation-string/" rel="nofollow">strings</a>: $concat, $toUpper, $toLower, $substr, $strcasecmp</li><li><a class="wiki_link_ext" href="https://docs.mongodb.org/manual/reference/operator/aggregation-arithmetic/" rel="nofollow">operadores aritméticos</a>: $abs, $add, $ceil, $divide, $exp, $floor, $ln, $log, $log10, $mod, $multiply, $pow, $sqrt, $substract, $trunc</li><li><a class="wiki_link_ext" href="https://docs.mongodb.org/manual/reference/operator/aggregation-set/" rel="nofollow">conjuntos (arrays vistos como)</a>: $setEquals, $setInsersection, $setUnion, $setDifference, $setIsSubset, $anyElementTrue, $allElementsTrue</li><li><a class="wiki_link_ext" href="https://docs.mongodb.org/manual/reference/operator/aggregation-array/" rel="nofollow">arrays</a>: $arrayElementAt, $concatArrays, $filter, $isArray, $size, $slice</li><li><a class="wiki_link_ext" href="https://docs.mongodb.org/manual/reference/operator/aggregation-date/" rel="nofollow">fechas</a>: $datOfYear, $dayOfMonth, $dayOfWeek, $yrear, $month, $week, $hour, $minute, $second, $millisecond, $dateToString</li><li><a class="wiki_link_ext" href="https://docs.mongodb.org/manual/reference/operator/aggregation-conditional/" rel="nofollow">condicionales</a>: cond, ifnull</li><li><a class="wiki_link_ext" href="https://docs.mongodb.org/manual/reference/operator/aggregation-projection/" rel="nofollow">otros</a>: map, let</li></ul><br>
+Ejemplo:<br>
+<br>
+Queremos disponer de los datos de distancias recorridas en millas, sabiendo que<br>
+<br>
+una milla = 1,60934 km<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+                      <span class="br0">[</span>
+                       <span class="br0">{</span>$project<span class="sy0">:</span>
+                               <span class="br0">{</span>
+                                distMillas<span class="sy0">:</span><span class="br0">{</span><span class="st0">'$multiply'</span><span class="sy0">:</span><span class="br0">[</span><span class="st0">'$distKm'</span><span class="sy0">,</span><span class="nu0">1.60934</span><span class="br0">]</span><span class="br0">}</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span>
+                       <span class="br0">]</span>
+                     <span class="br0">)</span></pre>
+
+<br>
+<hr>
+<br>
+<strong><img src="./MongoDB - Agregando_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong> $project solo incluye las claves que se indiquen, con excepción del _id que se incluye siempre pero se puede eliminar explícitamente el id con _id:0 . Si se quiere que una clave aparezca tal cual se puede poner clave:1 en la proyección<br>
+<hr>
+<br>
+<br>
+<hr>
+<img src="./MongoDB - Agregando_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: A partir de la observación anterior, si ponemos clave:1 incluirá el valor original, pero ¿y si queremos que tenga el valor 1? En este caso y similares es útil $literal; se pondría clave:{'$literal':1}<br>
+<hr>
+<br>
+<br>
+<hr>
+<ul class="quotelist"><li><strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>Considera el ejemplo. Queremos que documentos como:</li></ul>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> nombre<span class="sy0">:</span><span class="st0">"Bertoldo"</span><span class="sy0">,</span> mes<span class="sy0">:</span><span class="st0">"Marzo"</span><span class="sy0">,</span> distKm<span class="sy0">:</span><span class="nu0">6</span><span class="sy0">,</span> tiempoMin<span class="sy0">:</span><span class="nu0">42</span><span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">[</span><span class="br0">[</span>code<span class="br0">]</span><span class="br0">]</span>
+se transformen en documentos de la forma<span class="sy0">:</span>
+<span class="sy0">&gt;</span> <span class="br0">[</span><span class="br0">[</span>code format<span class="sy0">=</span><span class="st0">"javascript"</span><span class="br0">]</span><span class="br0">]</span>
+<span class="br0">{</span><span class="kw3">name</span><span class="sy0">:</span><span class="st0">"BERTOLDO"</span><span class="sy0">,</span> distKm<span class="sy0">:</span><span class="nu0">6</span><span class="br0">}</span></pre>
+
+<hr>
+<br>
+<h1 id="toc11"><a name="x$match"></a>$match</h1>
+ <br>
+Filtra elementos. Se puede usar tanto antes de la agregación (sería el where de SQL) como después (sería el having).<br>
+<br>
+Ejemplo:<br>
+<br>
+Queremos obtener la media en kilómetros mensuales de cada corredor, pero solo para aquellos valores medios sobre 5km,<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span> <span class="br0">[</span>
+   <span class="br0">{</span>$group<span class="sy0">:</span> <span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="sy0">,</span> mes<span class="sy0">:</span> <span class="st0">"$mes"</span><span class="br0">}</span><span class="sy0">,</span> media<span class="sy0">:</span> $avg<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span> <span class="br0">}</span> <span class="br0">}</span><span class="sy0">,</span>
+   <span class="br0">{</span>$match<span class="sy0">:</span> <span class="br0">{</span>media<span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">5</span><span class="br0">}</span><span class="br0">}</span> <span class="br0">}</span> <span class="br0">]</span>
+<span class="br0">)</span></pre>
+
+<br>
+Resultado:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"mes"</span> <span class="sy0">:</span> <span class="st0">"Abril"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">42</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"mes"</span> <span class="sy0">:</span> <span class="st0">"Marzo"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">10</span> <span class="br0">}</span>
+&nbsp;</pre>
+
+<br>
+<br>
+<hr>
+<strong><img src="./MongoDB - Agregando_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>Dentro de $match se puede usar por ejemplo $text con $search para buscar textos (se utiliza con índices textuales)<br>
+<hr>
+<br>
+<br>
+<h1 id="toc12"><a name="x$sort"></a>$sort</h1>
+ <br>
+Sort se emplea para ordenar los resultados. Hay dos formas de ordenar:<br>
+<br>
+<ul><li>En memoria: es el método por defecto. Es el más rápido pero tiene como límite 100 Mb en la colección a ordenar</li><li>Disco: más lento, pero sin límites; se obtiene añadiendo una etapa con forma {allowDiskUse:true}</li></ul><br>
+<hr>
+<strong><img src="./MongoDB - Agregando_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong> $match y $sort pueden usar índices, pero solo si se hacen al principio del pipeline<br>
+<hr>
+<br>
+Ejemplo: en el ejemplo de media de kilómetros por corredor y mes, ordenar por mes.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+<span class="br0">[</span>
+<span class="br0">{</span>$group<span class="sy0">:</span>
+<span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="sy0">,</span>
+mes<span class="sy0">:</span> <span class="st0">"$mes"</span><span class="br0">}</span><span class="sy0">,</span>
+media<span class="sy0">:</span> <span class="br0">{</span>$avg<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span>
+<span class="br0">}</span>
+<span class="br0">}</span><span class="sy0">,</span>
+<span class="br0">{</span>$sort<span class="sy0">:</span> <span class="br0">{</span><span class="st0">'_id.mes'</span><span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span> <span class="br0">}</span>
+<span class="br0">]</span>
+<span class="br0">)</span></pre>
+
+Respuesta del sistema:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.java5  {font-family:monospace;}
+.java5 .imp {font-weight: bold; color: red;}
+.java5 .kw1 {color: #000000;  font-weight: bold;}
+.java5 .kw2 {color: #000000; font-weight: bold;}
+.java5 .kw3 {color: #006600; font-weight: bold;}
+.java5 .kw4 {color: #006600; font-weight: bold;}
+.java5 .kw5 {color: #003399; font-weight: bold;}
+.java5 .kw6 {color: #003399; font-weight: bold;}
+.java5 .kw7 {color: #003399; font-weight: bold;}
+.java5 .kw8 {color: #003399; font-weight: bold;}
+.java5 .kw9 {color: #003399; font-weight: bold;}
+.java5 .kw10 {color: #003399; font-weight: bold;}
+.java5 .kw11 {color: #003399; font-weight: bold;}
+.java5 .kw12 {color: #003399; font-weight: bold;}
+.java5 .kw13 {color: #003399; font-weight: bold;}
+.java5 .kw14 {color: #003399; font-weight: bold;}
+.java5 .kw15 {color: #003399; font-weight: bold;}
+.java5 .kw16 {color: #003399; font-weight: bold;}
+.java5 .kw17 {color: #003399; font-weight: bold;}
+.java5 .kw18 {color: #003399; font-weight: bold;}
+.java5 .kw19 {color: #003399; font-weight: bold;}
+.java5 .kw20 {color: #003399; font-weight: bold;}
+.java5 .kw21 {color: #003399; font-weight: bold;}
+.java5 .kw22 {color: #003399; font-weight: bold;}
+.java5 .kw23 {color: #003399; font-weight: bold;}
+.java5 .kw24 {color: #003399; font-weight: bold;}
+.java5 .kw25 {color: #003399; font-weight: bold;}
+.java5 .kw26 {color: #003399; font-weight: bold;}
+.java5 .kw27 {color: #003399; font-weight: bold;}
+.java5 .kw28 {color: #003399; font-weight: bold;}
+.java5 .kw29 {color: #003399; font-weight: bold;}
+.java5 .kw30 {color: #003399; font-weight: bold;}
+.java5 .kw31 {color: #003399; font-weight: bold;}
+.java5 .kw32 {color: #003399; font-weight: bold;}
+.java5 .kw33 {color: #003399; font-weight: bold;}
+.java5 .kw34 {color: #003399; font-weight: bold;}
+.java5 .kw35 {color: #003399; font-weight: bold;}
+.java5 .kw36 {color: #003399; font-weight: bold;}
+.java5 .kw37 {color: #003399; font-weight: bold;}
+.java5 .kw38 {color: #003399; font-weight: bold;}
+.java5 .kw39 {color: #003399; font-weight: bold;}
+.java5 .kw40 {color: #003399; font-weight: bold;}
+.java5 .kw41 {color: #003399; font-weight: bold;}
+.java5 .kw42 {color: #003399; font-weight: bold;}
+.java5 .kw43 {color: #003399; font-weight: bold;}
+.java5 .kw44 {color: #003399; font-weight: bold;}
+.java5 .kw45 {color: #003399; font-weight: bold;}
+.java5 .kw46 {color: #003399; font-weight: bold;}
+.java5 .kw47 {color: #003399; font-weight: bold;}
+.java5 .kw48 {color: #003399; font-weight: bold;}
+.java5 .kw49 {color: #003399; font-weight: bold;}
+.java5 .kw50 {color: #003399; font-weight: bold;}
+.java5 .kw51 {color: #003399; font-weight: bold;}
+.java5 .kw52 {color: #003399; font-weight: bold;}
+.java5 .kw53 {color: #003399; font-weight: bold;}
+.java5 .kw54 {color: #003399; font-weight: bold;}
+.java5 .kw55 {color: #003399; font-weight: bold;}
+.java5 .kw56 {color: #003399; font-weight: bold;}
+.java5 .kw57 {color: #003399; font-weight: bold;}
+.java5 .kw58 {color: #003399; font-weight: bold;}
+.java5 .kw59 {color: #003399; font-weight: bold;}
+.java5 .kw60 {color: #003399; font-weight: bold;}
+.java5 .kw61 {color: #003399; font-weight: bold;}
+.java5 .kw62 {color: #003399; font-weight: bold;}
+.java5 .kw63 {color: #003399; font-weight: bold;}
+.java5 .kw64 {color: #003399; font-weight: bold;}
+.java5 .kw65 {color: #003399; font-weight: bold;}
+.java5 .kw66 {color: #003399; font-weight: bold;}
+.java5 .kw67 {color: #003399; font-weight: bold;}
+.java5 .kw68 {color: #003399; font-weight: bold;}
+.java5 .kw69 {color: #003399; font-weight: bold;}
+.java5 .kw70 {color: #003399; font-weight: bold;}
+.java5 .kw71 {color: #003399; font-weight: bold;}
+.java5 .kw72 {color: #003399; font-weight: bold;}
+.java5 .kw73 {color: #003399; font-weight: bold;}
+.java5 .kw74 {color: #003399; font-weight: bold;}
+.java5 .kw75 {color: #003399; font-weight: bold;}
+.java5 .kw76 {color: #003399; font-weight: bold;}
+.java5 .kw77 {color: #003399; font-weight: bold;}
+.java5 .kw78 {color: #003399; font-weight: bold;}
+.java5 .kw79 {color: #003399; font-weight: bold;}
+.java5 .kw80 {color: #003399; font-weight: bold;}
+.java5 .kw81 {color: #003399; font-weight: bold;}
+.java5 .kw82 {color: #003399; font-weight: bold;}
+.java5 .kw83 {color: #003399; font-weight: bold;}
+.java5 .kw84 {color: #003399; font-weight: bold;}
+.java5 .kw85 {color: #003399; font-weight: bold;}
+.java5 .kw86 {color: #003399; font-weight: bold;}
+.java5 .kw87 {color: #003399; font-weight: bold;}
+.java5 .kw88 {color: #003399; font-weight: bold;}
+.java5 .kw89 {color: #003399; font-weight: bold;}
+.java5 .kw90 {color: #003399; font-weight: bold;}
+.java5 .kw91 {color: #003399; font-weight: bold;}
+.java5 .kw92 {color: #003399; font-weight: bold;}
+.java5 .kw93 {color: #003399; font-weight: bold;}
+.java5 .kw94 {color: #003399; font-weight: bold;}
+.java5 .kw95 {color: #003399; font-weight: bold;}
+.java5 .kw96 {color: #003399; font-weight: bold;}
+.java5 .kw97 {color: #003399; font-weight: bold;}
+.java5 .kw98 {color: #003399; font-weight: bold;}
+.java5 .kw99 {color: #003399; font-weight: bold;}
+.java5 .kw100 {color: #003399; font-weight: bold;}
+.java5 .kw101 {color: #003399; font-weight: bold;}
+.java5 .kw102 {color: #003399; font-weight: bold;}
+.java5 .kw103 {color: #003399; font-weight: bold;}
+.java5 .kw104 {color: #003399; font-weight: bold;}
+.java5 .kw105 {color: #003399; font-weight: bold;}
+.java5 .kw106 {color: #003399; font-weight: bold;}
+.java5 .kw107 {color: #003399; font-weight: bold;}
+.java5 .kw108 {color: #003399; font-weight: bold;}
+.java5 .kw109 {color: #003399; font-weight: bold;}
+.java5 .kw110 {color: #003399; font-weight: bold;}
+.java5 .kw111 {color: #003399; font-weight: bold;}
+.java5 .kw112 {color: #003399; font-weight: bold;}
+.java5 .kw113 {color: #003399; font-weight: bold;}
+.java5 .kw114 {color: #003399; font-weight: bold;}
+.java5 .kw115 {color: #003399; font-weight: bold;}
+.java5 .kw116 {color: #003399; font-weight: bold;}
+.java5 .kw117 {color: #003399; font-weight: bold;}
+.java5 .kw118 {color: #003399; font-weight: bold;}
+.java5 .kw119 {color: #003399; font-weight: bold;}
+.java5 .kw120 {color: #003399; font-weight: bold;}
+.java5 .kw121 {color: #003399; font-weight: bold;}
+.java5 .kw122 {color: #003399; font-weight: bold;}
+.java5 .kw123 {color: #003399; font-weight: bold;}
+.java5 .kw124 {color: #003399; font-weight: bold;}
+.java5 .kw125 {color: #003399; font-weight: bold;}
+.java5 .kw126 {color: #003399; font-weight: bold;}
+.java5 .kw127 {color: #003399; font-weight: bold;}
+.java5 .kw128 {color: #003399; font-weight: bold;}
+.java5 .kw129 {color: #003399; font-weight: bold;}
+.java5 .kw130 {color: #003399; font-weight: bold;}
+.java5 .kw131 {color: #003399; font-weight: bold;}
+.java5 .kw132 {color: #003399; font-weight: bold;}
+.java5 .kw133 {color: #003399; font-weight: bold;}
+.java5 .kw134 {color: #003399; font-weight: bold;}
+.java5 .kw135 {color: #003399; font-weight: bold;}
+.java5 .kw136 {color: #003399; font-weight: bold;}
+.java5 .kw137 {color: #003399; font-weight: bold;}
+.java5 .kw138 {color: #003399; font-weight: bold;}
+.java5 .kw139 {color: #003399; font-weight: bold;}
+.java5 .kw140 {color: #003399; font-weight: bold;}
+.java5 .kw141 {color: #003399; font-weight: bold;}
+.java5 .kw142 {color: #003399; font-weight: bold;}
+.java5 .kw143 {color: #003399; font-weight: bold;}
+.java5 .kw144 {color: #003399; font-weight: bold;}
+.java5 .kw145 {color: #003399; font-weight: bold;}
+.java5 .kw146 {color: #003399; font-weight: bold;}
+.java5 .kw147 {color: #003399; font-weight: bold;}
+.java5 .kw148 {color: #003399; font-weight: bold;}
+.java5 .kw149 {color: #003399; font-weight: bold;}
+.java5 .kw150 {color: #003399; font-weight: bold;}
+.java5 .kw151 {color: #003399; font-weight: bold;}
+.java5 .kw152 {color: #003399; font-weight: bold;}
+.java5 .kw153 {color: #003399; font-weight: bold;}
+.java5 .kw154 {color: #003399; font-weight: bold;}
+.java5 .kw155 {color: #003399; font-weight: bold;}
+.java5 .kw156 {color: #003399; font-weight: bold;}
+.java5 .kw157 {color: #003399; font-weight: bold;}
+.java5 .kw158 {color: #003399; font-weight: bold;}
+.java5 .kw159 {color: #003399; font-weight: bold;}
+.java5 .kw160 {color: #003399; font-weight: bold;}
+.java5 .kw161 {color: #003399; font-weight: bold;}
+.java5 .kw162 {color: #003399; font-weight: bold;}
+.java5 .kw163 {color: #003399; font-weight: bold;}
+.java5 .kw164 {color: #003399; font-weight: bold;}
+.java5 .kw165 {color: #003399; font-weight: bold;}
+.java5 .kw166 {color: #003399; font-weight: bold;}
+.java5 .co1 {color: #666666; font-style: italic;}
+.java5 .co2 {color: #006699;}
+.java5 .co3 {color: #008000; font-style: italic; font-weight: bold;}
+.java5 .coMULTI {color: #666666; font-style: italic;}
+.java5 .es0 {color: #000099; font-weight: bold;}
+.java5 .br0 {color: #009900;}
+.java5 .sy0 {color: #339933;}
+.java5 .st0 {color: #0000ff;}
+.java5 .nu0 {color: #cc66cc;}
+.java5 .me1 {color: #006633;}
+.java5 .me2 {color: #006633;}
+.java5 span.xtra { display:block; }
+
+-->
+</style><pre class="java5"><span class="br0">{</span> <span class="st0">"_id"</span> : <span class="br0">{</span> <span class="st0">"nombre"</span> : <span class="st0">"Aniceto"</span>, <span class="st0">"mes"</span> : <span class="st0">"Abril"</span> <span class="br0">}</span>, <span class="st0">"media"</span> : <span class="nu0">5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> : <span class="br0">{</span> <span class="st0">"nombre"</span> : <span class="st0">"Herminia"</span>, <span class="st0">"mes"</span> : <span class="st0">"Abril"</span> <span class="br0">}</span>, <span class="st0">"media"</span> : <span class="nu0">42</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> : <span class="br0">{</span> <span class="st0">"nombre"</span> : <span class="st0">"Bertoldo"</span>, <span class="st0">"mes"</span> : <span class="st0">"Abril"</span> <span class="br0">}</span>, <span class="st0">"media"</span> : <span class="nu0">5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> : <span class="br0">{</span> <span class="st0">"nombre"</span> : <span class="st0">"Herminia"</span>, <span class="st0">"mes"</span> : <span class="st0">"Marzo"</span> <span class="br0">}</span>, <span class="st0">"media"</span> : <span class="nu0">10</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> : <span class="br0">{</span> <span class="st0">"nombre"</span> : <span class="st0">"Bertoldo"</span>, <span class="st0">"mes"</span> : <span class="st0">"Marzo"</span> <span class="br0">}</span>, <span class="st0">"media"</span> : <span class="nu0">4</span> <span class="br0">}</span></pre>
+
+<br>
+<br>
+<h1 id="toc13"><a name="x$skip, $limit"></a>$skip, $limit</h1>
+ <br>
+Son análogos al caso de find, y se usan siempre en combinación con sort. Útiles para obtener el mayor , el primero, etc<br>
+<br>
+<br>
+<br>
+Ejemplo: corredor que tiene mayor media absoluta:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+<span class="br0">[</span>
+<span class="br0">{</span>$group<span class="sy0">:</span>
+<span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="br0">}</span><span class="sy0">,</span>
+media<span class="sy0">:</span> <span class="br0">{</span>$avg<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span>
+<span class="br0">}</span>
+<span class="br0">}</span><span class="sy0">,</span>
+<span class="br0">{</span>$sort<span class="sy0">:</span> <span class="br0">{</span>media<span class="sy0">:-</span><span class="nu0">1</span><span class="br0">}</span> <span class="br0">}</span><span class="sy0">,</span>
+<span class="br0">{</span>$limit<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span>
+<span class="br0">]</span>
+<span class="br0">)</span></pre>
+
+Y se obtiene:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">20.666666666666668</span> <span class="br0">}</span></pre>
+
+<br>
+<br>
+<br>
+<hr>
+<strong><img src="./MongoDB - Agregando_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>Siempre primero $skip y luego $limit<br>
+<hr>
+<br>
+<br>
+<br>
+<br>
+<img src="https://gpd.sip.ucm.es/rafa/docencia/images/pipeline.jpg" alt="external image pipeline.jpg" title="external image pipeline.jpg" style="height: 196px; width: 350px;" align="right"><br>
+<h1 id="toc14"><a name="Etapas"></a>Etapas</h1>
+ <br>
+Una de las características más interesantes de las agrupaciones en MongoDB es que no solo se pueden combinar etapas, sino que incluso se pueden repetir. Ha llegado el momento de usar un poco la imaginación y unir los componentes que hemos visto hasta ahora. La idea recuerda un poco a las "vistas" en SQL<br>
+<br>
+Vamos a retomar alguna de las preguntas que hemos dejado sin contestar.<br>
+<br>
+<br>
+<hr>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta difícil. </span></strong> ¿Cómo calcular el número medio de sesiones por persona al mes? (es decir, se cuenta el número de sesiones por persona y mes y a continuación se hace la media de este dato)<br>
+<hr>
+<br>
+Idea:<br>
+- Sabemos contar el número de sesiones por mes.<br>
+- Sabemos hacer la media de unos valores<br>
+<br>
+¡usemos 2 etapas!<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+                      <span class="br0">[</span>
+                       <span class="br0">{</span>$group<span class="sy0">:</span>
+                               <span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="sy0">,</span> mes<span class="sy0">:</span> <span class="st0">"$mes"</span><span class="br0">}</span><span class="sy0">,</span>
+                                 sesiones<span class="sy0">:</span><span class="br0">{</span>$sum<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span> <span class="sy0">,</span>
+&nbsp;
+                        <span class="br0">{</span>$group<span class="sy0">:</span>
+                                <span class="br0">{</span>_id<span class="sy0">:</span><span class="st0">'$_id.nombre'</span><span class="sy0">,</span>
+                                 media<span class="sy0">:</span><span class="br0">{</span>$avg<span class="sy0">:</span><span class="st0">'$sesiones'</span><span class="br0">}</span>
+                                <span class="br0">}</span>
+                        <span class="br0">}</span>
+                       <span class="br0">]</span>
+                     <span class="br0">)</span></pre>
+
+<br>
+Es interesante observar que en la segunda agregación agrupamos por _id.nombre, ya que el _id de la etapa anterior es un documento con dos subcomponentes _id y media.<br>
+<br>
+<br>
+<hr>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>Consideramos la colección "fun":<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">fun</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">21</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">54</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">52</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">17</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">4</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">22</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">5</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">6</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">87</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">7</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"b"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"c"</span> <span class="sy0">:</span> <span class="nu0">97</span> <span class="br0">}</span></pre>
+
+¿Qué devolverá la consulta de agregación?<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">fun</span>.<span class="me1">aggregate</span><span class="br0">(</span><span class="br0">[</span>
+        <span class="br0">{</span>$group<span class="sy0">:</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="br0">{</span>a<span class="sy0">:</span><span class="st0">"$a"</span><span class="sy0">,</span> b<span class="sy0">:</span><span class="st0">"$b"</span><span class="br0">}</span><span class="sy0">,</span> c<span class="sy0">:</span><span class="br0">{</span>$max<span class="sy0">:</span><span class="st0">"$c"</span><span class="br0">}</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span>
+        <span class="br0">{</span>$group<span class="sy0">:</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="st0">"$_id.a"</span><span class="sy0">,</span> c<span class="sy0">:</span><span class="br0">{</span>$min<span class="sy0">:</span><span class="st0">"$c"</span><span class="br0">}</span><span class="br0">}</span><span class="br0">}</span>
+  <span class="br0">]</span><span class="br0">)</span></pre>
+
+<br>
+Check: 4 números que suman 75<br>
+<br>
+<hr>
+<br>
+<h1 id="toc15"><a name="x$out"></a>$out</h1>
+ <br>
+Redirige la salida de una agrupación creando una nueva colección. Es muy fácil de utilizar:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+                      <span class="br0">[</span>
+                       <span class="br0">{</span>$group<span class="sy0">:</span>
+                               <span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="sy0">,</span> mes<span class="sy0">:</span> <span class="st0">"$mes"</span><span class="br0">}</span><span class="sy0">,</span>
+                                 sesiones<span class="sy0">:</span><span class="br0">{</span>$sum<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span> <span class="sy0">,</span>
+&nbsp;
+                        <span class="br0">{</span>$group<span class="sy0">:</span>
+                                <span class="br0">{</span>_id<span class="sy0">:</span><span class="st0">'$_id.nombre'</span><span class="sy0">,</span>
+                                 media<span class="sy0">:</span><span class="br0">{</span>$avg<span class="sy0">:</span><span class="st0">'$sesiones'</span><span class="br0">}</span>
+                                <span class="br0">}</span>
+                        <span class="br0">}</span><span class="sy0">,</span>
+&nbsp;
+                        <span class="br0">{</span>$out<span class="sy0">:</span> <span class="st0">'sesiones_persona_mes'</span><span class="br0">}</span>
+                       <span class="br0">]</span>
+                     <span class="br0">)</span></pre>
+
+No muestra nada en la salida, porque se ha redireccionado a la nueva colección sesiones_persona_mes. Podemos comprobarlo:<br>
+<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones_persona_mes</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">3</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">3</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span><span class="sy0">,</span> <span class="st0">"media"</span> <span class="sy0">:</span> <span class="nu0">2</span> <span class="br0">}</span>
+&nbsp;</pre>
+
+<br>
+<br>
+<hr>
+<img src="./MongoDB - Agregando_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: $out es destructivo: si la colección ya existe la borra<br>
+<hr>
+<br>
+<br>
+<br>
+<br>
+<h1 id="toc16"><a name="x$lookup"></a>$lookup</h1>
+ <br>
+Es una etapa añadida en Mongo 3.2<br>
+<br>
+Sintaxis:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span>
+   $lookup<span class="sy0">:</span>
+     <span class="br0">{</span>
+       from<span class="sy0">:</span> <span class="sy0">&lt;</span>collection to join<span class="sy0">&gt;,</span>
+       localField<span class="sy0">:</span> <span class="sy0">&lt;</span>field from the input documents<span class="sy0">&gt;,</span>
+       foreignField<span class="sy0">:</span> <span class="sy0">&lt;</span>field from the documents of the <span class="st0">"from"</span> collection<span class="sy0">&gt;,</span>
+       <span class="kw1">as</span><span class="sy0">:</span> <span class="sy0">&lt;</span>output array field<span class="sy0">&gt;</span>
+     <span class="br0">}</span>
+<span class="br0">}</span></pre>
+
+<br>
+Ejemplo: utilizando las colecciones "sesiones" y "gustos" definidas en este capítulo, queremos conocer, para la persona que mayor distancia total ha recorrido:<br>
+<ul><li>Su nombre</li><li>La distancia total recorrida</li><li>Sus aficiones</li></ul><br>
+Solución:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+                      <span class="br0">[</span>
+                       <span class="br0">{</span>$group<span class="sy0">:</span>
+                               <span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="br0">}</span><span class="sy0">,</span>
+                                 total<span class="sy0">:</span><span class="br0">{</span>$sum<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span><span class="sy0">,</span>
+&nbsp;
+                        <span class="br0">{</span>$sort<span class="sy0">:</span><span class="br0">{</span>total<span class="sy0">:-</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span>
+&nbsp;
+                        <span class="br0">{</span>$limit<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="sy0">,</span>
+&nbsp;
+                        <span class="br0">{</span>$lookup<span class="sy0">:</span><span class="br0">{</span>
+                            from<span class="sy0">:</span><span class="st0">'gustos'</span><span class="sy0">,</span>
+                            localField<span class="sy0">:</span><span class="st0">'_id.nombre'</span><span class="sy0">,</span>
+                            foreignField<span class="sy0">:</span> <span class="st0">'nombre'</span><span class="sy0">,</span>
+                            <span class="kw1">as</span><span class="sy0">:</span> <span class="st0">'susGustos'</span> <span class="br0">}</span>
+                        <span class="br0">}</span><span class="sy0">,</span>
+&nbsp;
+                        <span class="br0">{</span>$unwind<span class="sy0">:</span><span class="st0">'$susGustos'</span><span class="br0">}</span><span class="sy0">,</span>
+&nbsp;
+                        <span class="br0">{</span>$project<span class="sy0">:</span> <span class="br0">{</span>
+                            _id<span class="sy0">:</span><span class="nu0">0</span><span class="sy0">,</span>
+                            nombre<span class="sy0">:</span><span class="st0">'$_id.nombre'</span><span class="sy0">,</span>
+                            total<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>
+                            aficiones<span class="sy0">:</span> <span class="st0">'$susGustos.aficiones'</span>  <span class="br0">}</span>
+                        <span class="br0">}</span>
+&nbsp;
+                       <span class="br0">]</span>
+                     <span class="br0">)</span></pre>
+
+<br>
+<br>
+La respuesta:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span> <span class="st0">"total"</span> <span class="sy0">:</span> <span class="nu0">124</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="st0">"correr"</span><span class="sy0">,</span> <span class="st0">"cine"</span> <span class="br0">]</span> <span class="br0">}</span></pre>
+
+<br>
+<br>
+<br>
+<hr>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>¿Se podría quitar el sort y el limit, y a cambio añadir un group con max? Algo parecido a:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">sesiones</span>.<span class="me1">aggregate</span><span class="br0">(</span>
+                      <span class="br0">[</span>
+                       <span class="br0">{</span>$group<span class="sy0">:</span>
+                               <span class="br0">{</span> _id<span class="sy0">:</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"$nombre"</span><span class="br0">}</span><span class="sy0">,</span>
+                                 total<span class="sy0">:</span><span class="br0">{</span>$sum<span class="sy0">:</span><span class="st0">'$distKm'</span><span class="br0">}</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span><span class="sy0">,</span>
+&nbsp;
+                       <span class="br0">{</span>$group<span class="sy0">:</span>
+                               <span class="br0">{</span>
+                                 _id<span class="sy0">:</span><span class="kw2">null</span><span class="sy0">,</span>
+                                 mayor<span class="sy0">:</span><span class="br0">{</span><span class="st0">'$max'</span><span class="sy0">:</span><span class="st0">'$total'</span><span class="br0">}</span>
+                               <span class="br0">}</span>
+                        <span class="br0">}</span> <span class="br0">]</span><span class="br0">)</span></pre>
+
+<br>
+<br>
+<hr>
+<br>
+<hr>
+<br>
+<strong><img src="./MongoDB - Agregando_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>El uso de <em>_id:null</em> es el truco que permite agrupar toda la colección.<br>
+<hr>
+<br>
+<br>
+<hr>
+<br>
+<strong><img src="./MongoDB - Agregando_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>Se puede obtener el plan de una operación de agrupación añadiendo una etapa final {explain:true}<br>
+<hr>
+<br>
+<h1 id="toc17"><a name="Map Reduce"></a>Map Reduce</h1>
+ <br>
+<br>
+Es un sistema de procesamiento basado en dos etapas:<br>
+<br>
+<ul><li>map. Entrada: un documento. Salida: para cada documento se genera una o varias parejas (clave,valor)</li><li>reduce. Entrada: una clave con todos sus valores. Salida: un valor (asociado de forma implícita a la clave de entrada)</li></ul><br>
+<img src="http://dme.rwth-aachen.de/en/system/files/file_upload/project/MapReduce.jpg" alt="external image MapReduce.jpg" title="external image MapReduce.jpg" style="height: 584px; width: 776px;"><br>
+(fuente: <a class="wiki_link_ext" href="http://dme.rwth-aachen.de/en/system/files/file_upload/project/MapReduce.jpg" rel="nofollow">http://dme.rwth-aachen.de/en/system/files/file_upload/project/MapReduce.jpg</a>)<br>
+<br>
+Esquema general en MongoDB:<br>
+<br>
+<img src="./MongoDB - Agregando_files/map-reduce.png" alt="external image map-reduce.png" title="external image map-reduce.png"><br>
+(fuente: <a class="wiki_link_ext" href="./MongoDB - Agregando_files/map-reduce.png" rel="nofollow">https://docs.mongodb.org/manual/_images/map-reduce.png</a> )<br>
+<br>
+<strong>Ejemplo 1</strong>:<br>
+<br>
+Partimos de la siguiente colección:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">frases</span>.<span class="me1">drop</span><span class="br0">(</span><span class="br0">)</span>
+db.<span class="me1">frases</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>frase<span class="sy0">:</span><span class="st0">"el que sabe no habla"</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">frases</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="nu0">2</span><span class="sy0">,</span>frase<span class="sy0">:</span><span class="st0">"el que habla no sabe"</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">frases</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="nu0">3</span><span class="sy0">,</span>frase<span class="sy0">:</span><span class="st0">"no me digas que no"</span><span class="br0">}</span><span class="br0">)</span>
+&nbsp;</pre>
+
+Queremos contar el número de repeticiones de cada palabra.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">var</span> mapFunctionFrase <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+   x <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">frase</span>.<span class="me1">split</span><span class="br0">(</span><span class="st0">" "</span><span class="br0">)</span><span class="sy0">;</span>
+   <span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span>x.<span class="me1">length</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span>
+        emit<span class="br0">(</span>x<span class="br0">[</span>i<span class="br0">]</span><span class="sy0">,</span> <span class="nu0">1</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span><span class="sy0">;</span>
+<span class="kw2">var</span> reduceFunctionFrase <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span>palabra<span class="sy0">,</span>cuantas<span class="br0">)</span><span class="br0">{</span>
+     <span class="kw1">return</span> Array.<span class="me1">sum</span><span class="br0">(</span>cuantas<span class="br0">)</span><span class="sy0">;</span><span class="br0">}</span><span class="sy0">;</span>
+&nbsp;
+db.<span class="me1">frases</span>.<span class="me1">mapReduce</span><span class="br0">(</span>mapFunctionFrase<span class="sy0">,</span>
+                       reduceFunctionFrase<span class="sy0">,</span>
+                       <span class="br0">{</span>out<span class="sy0">:</span> <span class="st0">"palabras"</span><span class="br0">}</span>
+                      <span class="br0">)</span>
+&nbsp;</pre>
+
+<br>
+<strong>Ejemplo 2</strong>:<br>
+<br>
+En el ejemplo anterior, obtener la longitud de la frase más larga en toda la colección:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">var</span> mapFunctionFraseLarga <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+        emit<span class="br0">(</span><span class="st0">"max"</span><span class="sy0">,</span> <span class="kw1">this</span>.<span class="me1">frase</span>.<span class="me1">length</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span><span class="sy0">;</span>
+<span class="kw2">var</span> reduceFunctionFraseLarga <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span>clave<span class="sy0">,</span>longs<span class="br0">)</span><span class="br0">{</span>
+     max <span class="sy0">=</span> longs<span class="br0">[</span><span class="nu0">0</span><span class="br0">]</span><span class="sy0">;</span>
+     <span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">1</span><span class="sy0">;</span> i<span class="sy0">&lt;</span>longs.<span class="me1">length</span><span class="sy0">;</span>i<span class="sy0">++</span><span class="br0">)</span>
+          <span class="kw1">if</span> <span class="br0">(</span>longs<span class="br0">[</span>i<span class="br0">]</span><span class="sy0">&gt;</span>max<span class="br0">)</span>
+             max <span class="sy0">=</span> longs<span class="br0">[</span>i<span class="br0">]</span><span class="sy0">;</span>
+&nbsp;
+     <span class="kw1">return</span> max<span class="sy0">;</span><span class="br0">}</span><span class="sy0">;</span>
+&nbsp;
+db.<span class="me1">frases</span>.<span class="me1">mapReduce</span><span class="br0">(</span>mapFunctionFraseLarga<span class="sy0">,</span>
+                       reduceFunctionFraseLarga<span class="sy0">,</span>
+                       <span class="br0">{</span>out<span class="sy0">:</span> <span class="br0">{</span>inline<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">}</span>
+                      <span class="br0">)</span>
+&nbsp;</pre>
+
+<br>
+<strong>Ejemplo 3</strong>:<br>
+<br>
+Volvemos a considerar el ejemplo de las sesiones de entrenamiento, queremos saber cuántos kilómetros a recorrido cada persona al mes usando MapReduce:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">var</span> mapKmPersonaMes <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span><span class="br0">)</span><span class="br0">{</span>
+        emit<span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="kw1">this</span>.<span class="me1">nombre</span><span class="sy0">,</span> mes<span class="sy0">:</span><span class="kw1">this</span>.<span class="me1">mes</span><span class="br0">}</span><span class="sy0">,</span> <span class="kw1">this</span>.<span class="me1">distKm</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span><span class="sy0">;</span>
+<span class="kw2">var</span> reduceKmPersonaMes <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">(</span>dato<span class="sy0">,</span>cuantos<span class="br0">)</span><span class="br0">{</span>
+     <span class="kw1">return</span> Array.<span class="me1">sum</span><span class="br0">(</span>cuantos<span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span><span class="sy0">;</span>
+&nbsp;
+db.<span class="me1">sesiones</span>.<span class="me1">mapReduce</span><span class="br0">(</span>mapKmPersonaMes<span class="sy0">,</span>
+                       reduceKmPersonaMes<span class="sy0">,</span>
+                       <span class="br0">{</span>out<span class="sy0">:</span> <span class="st0">"kmMes"</span><span class="br0">}</span>
+                      <span class="br0">)</span></pre>
+
+<br>
+<br>
+<h1 id="toc38"><a name="Vistas"></a>Vistas</h1>
+ <br>
+Las vistas se introdujeron en la versión 3.4 de MongoDB. Se puede pensar en una vista como una colección "virtual" que se crea a partir de una consulta.  <br>
+<br>
+<!--
+<hr>
+<img src="http://gpd.sip.ucm.es/rafa/docencia/programacion/images/bee.gif" alt="external image bee.gif" title="external image bee.gif" /><strong><span style="color: #0000ff;">Aviso</span></strong> <br />
+Muchas características de la versión 3.4 necesitan ser activadas. Para ello debemos teclear: 
+<pre>
+db.adminCommand( { setFeatureCompatibilityVersion: "3.4" } )
+</pre>
+<hr />
+-->
+Características principales:
+
+<ol>
+<li> Las vistas se definen a través de una consulta de agregación.  
+<pre>db.createView(view, source, pipeline, collation)
+</pre>
+Donde <ol>
+  <li>view: Un string con el nombre de la vista a crear.
+  </li><li>source: Un string con el nombre de la colección en la que se basa.
+  </li><li>pipeline: la secuencia de agregación que define la vista
+  </li><li>collation:  adaptaciones locales ver <a href="https://docs.mongodb.com/manual/reference/collation/">aquí</a>
+  </li></ol>
+</li><li> Las vistas son de solo lectura; es decir no podemos insertar/borrar/actualizar datos en una vista.
+     En particular las vistas solo se pueden usar en las instrucciones:
+	 <ul>
+	 
+    <li> db.collection.find()
+    </li><li>db.collection.findOne()
+    </li><li>db.collection.aggregate()
+    </li><li>db.collection.count()
+    </li><li>db.collection.distinct()
+
+	 </li></ul>
+</li><li> Si actualizamos la colección base la vista automáticamente cambia.
+</li><li> Se muestran como una colleción más con "show collections".
+</li><li> La consulta se almacena en System.views.
+</li></ol>
+<br>
+<br>
+<h1 id="toc18"><a name="Enlaces"></a>Enlaces</h1>
+ <br>
+<ul><li>Un buen editor online de código javascript, para teclear las consultas: <a class="wiki_link_ext" href="https://jsfiddle.net/" rel="nofollow">https://jsfiddle.net/</a></li><li>Manual de Mongo DB: <a class="wiki_link_ext" href="https://docs.mongodb.org/manual/aggregation/" rel="nofollow">agregación</a></li><li><a class="wiki_link_ext" href="https://www.mongodb.com/presentations/mongodbs-new-aggregation-framework-2" rel="nofollow">Charla sobre agregación</a> en MongoDB</li></ul><br>
+<hr>
+<br>
+<a class="wiki_link" href="http://gpd.sip.ucm.es/rafa/docencia/nosql/MongoDB.html">Página principal MongoDB</a><br>
+<br>
+<hr>
+
+    
+  
+
+</body></html>

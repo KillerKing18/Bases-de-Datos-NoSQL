@@ -1,0 +1,1613 @@
+
+<!-- saved from url=(0054)http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>NoSQL-FdI - Índices en MongoDB</title>
+    <link rel="stylesheet" href="./NoSQL-FdI - Índices en MongoDB_files/style.css" type="text/css">
+    
+  <link id="avast_os_ext_custom_font" href="chrome-extension://eofcbnmajmjmplflapaojjnihcjkigck/common/ui/fonts/fonts.css" rel="stylesheet" type="text/css"></head>
+<body style="background-color: rgb(255, 255, 255);" link="#000099">
+<b><font size="-1"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/index.html"><img src="./NoSQL-FdI - Índices en MongoDB_files/nosqllogo.png" width="60"> Bases de Datos NoSQL - RafaC - 2017/2018</a></font>
+</b> <br>
+    <div class="wiki" id="content_view" style="display: block;">
+Vamos a estudiar la manipulación de índices en MongoDB y su impacto en la eficiencia. Pero antes de eso comenzamos con algunos conocimientos básicos acerca de laarquitectura de interna de MongoDB.<br>
+<div id="toc"><h1 class="nopad">Índice</h1><div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Motor%20de%20almacenamiento">Motor de almacenamiento</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Concepto%20de%20%C3%8Dndice">Concepto de Índice</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#toc2"> </a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Creaci%C3%B3n%20y%20borrado">Creación y borrado</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices">Tipos de índices</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#toc5"> </a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-%C3%9Anicos">Únicos</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#toc7"> </a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-Compuestos">Compuestos</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-Arrays">Arrays</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-Subdocumentos">Subdocumentos</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-Dispersos">Dispersos</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-Con%20caducidad">Con caducidad</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-En%20background">En background</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-Geoespaciales">Geoespaciales</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-2d-plano">2d-plano</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-2d-esf%C3%A9rico">2d-esférico</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Tipos%20de%20%C3%ADndices-Textuales">Textuales</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Planes%20de%20ejecuci%C3%B3n">Planes de ejecución</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#toc19"> </a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Planes%20de%20ejecuci%C3%B3n-queryPlanner">queryPlanner</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Planes%20de%20ejecuci%C3%B3n-executionStats">executionStats</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#toc22"> </a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Planes%20de%20ejecuci%C3%B3n-allPlansExecution">allPlansExecution</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Consejos%20sobre%20%C3%ADndices">Consejos sobre índices</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Profiler">Profiler</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/indices.html#Enlaces">Enlaces</a></div>
+</div>
+<h1 id="toc0"><a name="Motor de almacenamiento"></a>Motor de almacenamiento</h1>
+ <br>
+El motor de almacenamiento en el componente de Mongo se encarga de las lecturas y escrituras en disco:<br>
+<br>
+<img src="./NoSQL-FdI - Índices en MongoDB_files/storageengine.jpg" alt="external image storageengine.jpg" title="external image storageengine.jpg"><br>
+A partir de Mongo 3.0 el motor es configurable y vienen 2 por defecto en la configuración.<br>
+<br>
+<ul><li>MMAPv1 : teniendo en cuenta que el disco es la parte más lenta, MMAPv1 se basa en el uso de páginas en memoria. Basado en el sistema mmap de unix.<ul><li>Almacena tamaños que tienen que ser potencias de 2 (un mínimo de 32 bytes)</li><li>Almacena la información en páginas de memoria, intercambiando con disco según hace falta</li><li>Permite lock a nivel de colección</li><li>Al hacer update intenta que el edocumento crezca; si no cabe lo mueve a otro sitio y deja un hueco que se usará si se puede- después</li></ul></li><li>WiredTiger: El el motor por defecto a partir de la versión 3.2 Mejora aspectos como<ul><li>Admite compresión de datos</li><li>Tiene lock a nivel de documento</li></ul></li></ul><br>
+Cambiar el motor de almacenamiento no afecta el interfaz con el usuario, ni tampoco, por ejemplo, la comunicación entre nodos de un clúster. Para cambiarlo hay queparar el sistema actual y crear una carpeta de datos nueva (para no mezclar formatos):<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">killall mongod
+mkdir mmap
+mongod --storageEngine mmapv1 --dbpath /home/rafa/docencia/15-16/nosql/apuntes/mongodb/mmap</pre>
+
+<br>
+No se pueden mezclar, porque cada motor tiene su propio formato de índices y ficheros de datos.<br>
+<br>
+<h1 id="toc1"><a name="Concepto de Índice"></a>Concepto de Índice</h1>
+ Los índices son estructuras auxiliares que permiten a la base de datos acceder más rápido a ciertos documentos. Se pueden imaginar como una copia "ordenada" de ciertas claves de una colección.<br>
+Esta copia incluye, además de las claves ordenadas, un índice (puntero) al documento que la contiene.<br>
+<br>
+<img src="./NoSQL-FdI - Índices en MongoDB_files/index-table-figure-3.png" alt="external image databases-index-secondary.gif" title="external image databases-index-secondary.gif" width="600"><br>
+<br>
+<br>
+Permiten mejorar la eficiencia de muchas operaciones CRUD, evitando los recorridos completos de las colecciones. Es el usuario el que debe decidir qué índices son los más adecuados para su base de datos (veremos algunos criterios).<br>
+<br>
+<br>
+<hr>
+<strong><img src="./NoSQL-FdI - Índices en MongoDB_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>La mayoría de las bases de datos -y también Mongo- usan un tipo de árboles llamados BTree para almacenar internamente los índices. El motor WiredTiger usa una variante llamada b+trees.<br>
+<hr>
+<br>
+<br>
+<hr>
+<strong><img src="./NoSQL-FdI - Índices en MongoDB_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>En general añadir índices tiene un efecto sobre la mejora del rendimiento más apreciable que comprar más memoria, cambiar el disco o incluso un ordenador con CPU más rápida. ¡Y es gratis!<br>
+<hr>
+<br>
+<h1 id="toc2"> </h1>
+ <h1 id="toc3"><a name="Creación y borrado"></a>Creación y borrado</h1>
+ <br>
+Cada colección tiene su propio conjunto de índices. Para crear un índice nuevo se utiliza la instrucción createIndex:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">cuentas</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>direccion<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="st0">"createdCollectionAutomatically"</span> <span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+    <span class="st0">"numIndexesBefore"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+    <span class="st0">"numIndexesAfter"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span>
+    <span class="st0">"ok"</span> <span class="sy0">:</span> <span class="nu0">1</span>
+<span class="br0">}</span></pre>
+
+La sintaxis recuerda a la de la función sort: el argumento especifica las claves por las que se indexará.<br>
+Las claves pueden ser de cualquier tipo, incluidos arrays y subdocumentos (aunque esto solo tiene sentido a veces). El valor a cada clave puede ser 1 (orden ascendente) o -1 (orden descendente)<br>
+<br>
+En todo momento podemos preguntar por los índices asociados a una colección:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">cuentas</span>.<span class="me1">getIndexes</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">[</span>
+    <span class="br0">{</span>
+        <span class="st0">"v"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+        <span class="st0">"key"</span> <span class="sy0">:</span> <span class="br0">{</span>
+            <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">1</span>
+        <span class="br0">}</span><span class="sy0">,</span>
+        <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"_id_"</span><span class="sy0">,</span>
+        <span class="st0">"ns"</span> <span class="sy0">:</span> <span class="st0">"banco.cuentas"</span>
+    <span class="br0">}</span><span class="sy0">,</span>
+    <span class="br0">{</span>
+        <span class="st0">"v"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+        <span class="st0">"key"</span> <span class="sy0">:</span> <span class="br0">{</span>
+            <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+            <span class="st0">"direccion"</span> <span class="sy0">:</span> <span class="nu0">1</span>
+        <span class="br0">}</span><span class="sy0">,</span>
+        <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"nombre_1_direccion_1"</span><span class="sy0">,</span>
+        <span class="st0">"ns"</span> <span class="sy0">:</span> <span class="st0">"banco.cuentas"</span>
+    <span class="br0">}</span>
+<span class="br0">]</span>
+&nbsp;</pre>
+
+Vemos que devuelve un array que en este ejemplo tiene dos índices:<br>
+<br>
+<ol><li>El primero corresponde al _id. Se crea <strong><em>automáticamente</em></strong> al insertar el primer valor en la colección.</li><li>El segundo e el que acabamos de crear.</li></ol><br>
+El valor "v" al principio es la versión del índice y tiene que ver con la versińo de Mongo. Los índices creados con versiones anteriores a la 2.0 llevar versión "0" y los posteriores "1".<br>
+<br>
+Podemos ver además que internamente ambos índices tienen un nombre. Pro ejemplo, el que acabamos de crear se llama "nombre_1_direccion_1".<br>
+<br>
+Para borrar un índice utilizaremos dropIndex, con el mismo parámetro utilizado para crearlo.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">cuentas</span>.<span class="me1">dropIndex</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>direccion<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nIndexesWas"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span> <span class="st0">"ok"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> db.<span class="me1">cuentas</span>.<span class="me1">getIndexes</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">[</span>
+    <span class="br0">{</span>
+        <span class="st0">"v"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+        <span class="st0">"key"</span> <span class="sy0">:</span> <span class="br0">{</span>
+            <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">1</span>
+        <span class="br0">}</span><span class="sy0">,</span>
+        <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"_id_"</span><span class="sy0">,</span>
+        <span class="st0">"ns"</span> <span class="sy0">:</span> <span class="st0">"banco.cuentas"</span>
+    <span class="br0">}</span>
+<span class="br0">]</span></pre>
+
+<br>
+También se puede borrar el índice con dropIndex(nombre) con nombre el valor name mostrado en getIndexes. El valor del nombre también se puede indicar al crear el índice:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"> db.<span class="me1">cuentas</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:-</span><span class="nu0">1</span><span class="br0">}</span><span class="sy0">,</span><span class="st0">"inombresDesc"</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="st0">"createdCollectionAutomatically"</span> <span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+    <span class="st0">"numIndexesBefore"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+    <span class="st0">"numIndexesAfter"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span>
+    <span class="st0">"ok"</span> <span class="sy0">:</span> <span class="nu0">1</span>
+<span class="br0">}</span>
+.... <span class="me1">vamos</span> a borrar el índice por nombre
+ db.<span class="me1">cuentas</span>.<span class="me1">dropIndex</span><span class="br0">(</span><span class="st0">"inombresDesc"</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nIndexesWas"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span> <span class="st0">"ok"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span></pre>
+
+<br>
+<br>
+<hr>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png"><span style="color: #005a35;">Pregunta. </span></strong><br>
+Dado el índice:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">db.cuentas.createIndex({nombre:1,direccion:1})</pre>
+
+y supón una implementación de los índices como la descrita informalmente al comienzo de esta página.¿En cuál o cuáles de las siguientes operaciones podrá utilizarse?
+<ul>
+<li> .....sort({nombre:1, direccion:1}}
+</li><li> .....sort({nombre:1, direccion:-1})
+</li><li>......sort(direccion:1,nombre:1})
+</li><li> .....sort({nombre:-1, direccion:-1}}
+
+</li></ul><br>
+<hr>
+<br>
+<hr>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/programacion/images/bee.gif" alt="external image bee.gif" title="external image bee.gif"><span style="color: #005a35;">Aviso. </span></strong> La creación/borrado de índices pueden ser operaciones muy costosas en colecciones grandes. Se suelen crear al principio y solo se borran en circunstancias especiales. En bases de datos, la creación y borrado de índices suele corresponder al DBA, no al programador.<br>
+<hr>
+<br>
+<hr>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png"><span style="color: #005a35;">Pregunta. </span></strong>¿Qué crees que pasará al crear un índice sobre una clave que no existe en ningún documento de la coleccion? ¿MongoDB dará un error? ¿Un warning? ¿Nada?<br>
+<hr>
+<br>
+<strong>Ejemplo</strong>: probar a crear una coleccion realmente grande, y ver cómo afecta la creación de índices.<br>
+<br>
+<h1 id="toc4"><a name="Tipos de índices"></a>Tipos de índices</h1>
+ <br>
+Por defecto los índices en MongoDB se almacenan en aŕboles B y admiten valores duplicados en las claves. Sin embargo esto se puede modificar añadiendo una opción durante la creación del índice (como segundo parámetro), Es decir, la sintaxis general para los índices es:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">createIndex</span><span class="br0">(</span>claves<span class="sy0">,</span> opciones<span class="br0">)</span></pre>
+
+<br>
+Vamos a ver algunas de estas opciones:<br>
+<h2 id="toc5"> </h2>
+ <h2 id="toc6"><a name="Tipos de índices-Únicos"></a>Únicos</h2>
+ Impide que la(s) clave(s) se repitan.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">personas</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>apellidos<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>unique<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="st0">"createdCollectionAutomatically"</span> <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span>
+    <span class="st0">"numIndexesBefore"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+    <span class="st0">"numIndexesAfter"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span>
+    <span class="st0">"ok"</span> <span class="sy0">:</span> <span class="nu0">1</span>
+<span class="br0">}</span>
+<span class="sy0">&gt;</span> db.<span class="me1">personas</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"bertoldo"</span><span class="sy0">,</span>apellidos<span class="sy0">:</span><span class="st0">"cacaseno"</span><span class="br0">}</span><span class="br0">)</span>
+WriteResult<span class="br0">(</span><span class="br0">{</span> <span class="st0">"nInserted"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> db.<span class="me1">personas</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"herminia"</span><span class="sy0">,</span>apellidos<span class="sy0">:</span><span class="st0">"cacaseno"</span><span class="br0">}</span><span class="br0">)</span>
+WriteResult<span class="br0">(</span><span class="br0">{</span> <span class="st0">"nInserted"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> db.<span class="me1">personas</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"bertoldo"</span><span class="sy0">,</span>apellidos<span class="sy0">:</span><span class="st0">"chirimoyo"</span><span class="br0">}</span><span class="br0">)</span>
+WriteResult<span class="br0">(</span><span class="br0">{</span> <span class="st0">"nInserted"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> db.<span class="me1">personas</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"bertoldo"</span><span class="sy0">,</span>apellidos<span class="sy0">:</span><span class="st0">"cacaseno"</span><span class="br0">}</span><span class="br0">)</span>
+WriteResult<span class="br0">(</span><span class="br0">{</span>
+    <span class="st0">"nInserted"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+    <span class="st0">"writeError"</span> <span class="sy0">:</span> <span class="br0">{</span>
+        <span class="st0">"code"</span> <span class="sy0">:</span> <span class="nu0">11000</span><span class="sy0">,</span>
+        <span class="st0">"errmsg"</span> <span class="sy0">:</span> <span class="st0">"insertDocument :: caused by ::
+                           11000 E11000 duplicate key error index:
+  datos_personas.personas.$nombre_1_apellidos_1  dup key: { : <span class="es0">\"</span>bertoldo<span class="es0">\"</span>, : <span class="es0">\"</span>cacaseno<span class="es0">\"</span> }"</span>
+    <span class="br0">}</span>
+<span class="br0">}</span><span class="br0">)</span>
+&nbsp;</pre>
+
+<br>
+<br>
+El índice automático que se crea para _id es de tipo único.<br>
+<br>
+<hr>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png"><span style="color: #005a35;">Pregunta. </span></strong>En el ejemplo anterior, ¿podrían incluirse personas sin nombre y/o apellidas?<br>
+1) No, el índice exige que existan<br>
+2) Sí, no cuentan para el índice<br>
+3) Sí, pero solo una vez, ya que se les da un valor "null", que tampoco puede repetirse<br>
+<hr>
+<h2 id="toc7"> </h2>
+ <h2 id="toc8"><a name="Tipos de índices-Compuestos"></a>Compuestos</h2>
+ <br>
+Son los índices que emplean más de una clave; no hay que indicarlo explícitamente. Ya hemos visto algún ejemplo:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>direccion<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+<h2 id="toc9"><a name="Tipos de índices-Arrays"></a>Arrays</h2>
+ <br>
+Se pueden crear índices sobre claves que contienen arrays; lo que hace Mongo es crear un valor en el índice para cada valor del array. Se llaman indices multikey. No hace falta indicarlo explícitamente,<br>
+<br>
+<br>
+<hr>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/programacion/images/bee.gif" alt="external image bee.gif" title="external image bee.gif"><span style="color: #005a35;">Aviso. </span></strong>Ojo con los índices multikey compuestos; si algún documento tiene arrays en mas de una clave del índice se producirá un error.<br>
+Ejemplo<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">multi</span>.<span class="me1">drop</span><span class="br0">(</span><span class="br0">)</span>
+db.<span class="me1">multi</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>b<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">multi</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">10</span><span class="sy0">,</span>b<span class="sy0">:</span><span class="nu0">11</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">multi</span>.<span class="me1">explain</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">4</span><span class="br0">}</span><span class="br0">)</span>
+  ...
+                <span class="st0">"stage"</span> <span class="sy0">:</span> <span class="st0">"IXSCAN"</span><span class="sy0">,</span>
+                <span class="st0">"indexName"</span> <span class="sy0">:</span> <span class="st0">"a_1_b_1"</span><span class="sy0">,</span>
+                <span class="st0">"isMultiKey"</span> <span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+db.<span class="me1">multi</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="br0">[</span><span class="nu0">5</span><span class="sy0">,</span><span class="nu0">4</span><span class="sy0">,</span><span class="nu0">3</span><span class="sy0">,</span><span class="nu0">2</span><span class="sy0">,</span><span class="nu0">1</span><span class="br0">]</span><span class="sy0">,</span>b<span class="sy0">:-</span><span class="nu0">444</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">multi</span>.<span class="me1">explain</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">4</span><span class="br0">}</span><span class="br0">)</span>
+...
+                <span class="st0">"stage"</span> <span class="sy0">:</span> <span class="st0">"IXSCAN"</span><span class="sy0">,</span>
+                <span class="st0">"indexName"</span> <span class="sy0">:</span> <span class="st0">"a_1_b_1"</span><span class="sy0">,</span>
+                <span class="st0">"isMultiKey"</span> <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span>
+....
+<span class="me1">db</span>.<span class="me1">multi</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="st0">"hola"</span><span class="sy0">,</span>b<span class="sy0">:</span><span class="br0">[</span><span class="nu0">123</span><span class="sy0">,</span><span class="nu0">56</span><span class="sy0">,</span><span class="nu0">7.68</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">multi</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="br0">[</span><span class="nu0">0</span><span class="sy0">,</span><span class="nu0">0</span><span class="sy0">,</span><span class="nu0">0</span><span class="br0">]</span><span class="sy0">,</span>b<span class="sy0">:</span><span class="br0">[</span><span class="nu0">123</span><span class="sy0">,</span><span class="nu0">56</span><span class="sy0">,</span><span class="nu0">7.68</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span>
+WriteResult<span class="br0">(</span><span class="br0">{</span>
+    <span class="st0">"nInserted"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+    <span class="st0">"writeError"</span> <span class="sy0">:</span> <span class="br0">{</span>
+        <span class="st0">"code"</span> <span class="sy0">:</span> <span class="nu0">10088</span><span class="sy0">,</span>
+        <span class="st0">"errmsg"</span> <span class="sy0">:</span> <span class="st0">"cannot index parallel arrays [b] [a]"</span>
+    <span class="br0">}</span>
+<span class="br0">}</span><span class="br0">)</span>
+&nbsp;</pre>
+
+<br>
+El problema es que la indexación de dos arrays obliga a un tiempo cuadrático, y se evita por eficiencia<br>
+<hr>
+<br>
+<h2 id="toc10"><a name="Tipos de índices-Subdocumentos"></a>Subdocumentos</h2>
+ <br>
+Se puede crear un indice sobre un subdocumento. Incluso se pueden mezclar las dos opciones:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"> db.<span class="me1">cuentas</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span><span class="st0">"cuentas.saldo"</span><span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span>
+ db.<span class="me1">cuentas</span>.<span class="me1">explain</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span><span class="st0">"cuentas.saldo"</span><span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">1500</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+   .....             <span class="st0">"stage"</span> <span class="sy0">:</span> <span class="st0">"FETCH"</span><span class="sy0">,</span>
+            <span class="st0">"inputStage"</span> <span class="sy0">:</span> <span class="br0">{</span>
+                <span class="st0">"stage"</span> <span class="sy0">:</span> <span class="st0">"IXSCAN"</span><span class="sy0">,</span>
+                <span class="st0">"keyPattern"</span> <span class="sy0">:</span> <span class="br0">{</span>
+                    <span class="st0">"cuentas.saldo"</span> <span class="sy0">:</span> <span class="nu0">1</span>
+                <span class="br0">}</span><span class="sy0">,</span>
+                <span class="st0">"indexName"</span> <span class="sy0">:</span> <span class="st0">"cuentas.saldo_1"</span><span class="sy0">,</span>
+                <span class="st0">"isMultiKey"</span> <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span></pre>
+
+<br>
+<br>
+<br>
+<h2 id="toc11"><a name="Tipos de índices-Dispersos"></a>Dispersos</h2>
+ <br>
+Los índices dispersos (sparse), son útiles cuando una clave aparece muy rara vez, es decir cuando la amplia mayoría de los documentos no contienen la clave. En ese caso indicar <em>sparse:true</em> hará que el índice sea más eficiente.<br>
+<br>
+<hr>
+<strong><img src="./NoSQL-FdI - Índices en MongoDB_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>Los índices dispersos pueden ser únicos; los valores null no se tienen en cuenta en ese caso y no darán error de duplicidad ya que no aparecen en el índice.<br>
+<hr>
+<br>
+<br>
+<hr>
+<br>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png"><span style="color: #005a35;">Pregunta. </span></strong>Discutir la cardinalidad de los índices, en sentido de relación entre el número de entradas que tiene el índice y el número de entradas que tiene la colección subyacente. Pensarlo para los casos de índice normal, multikey y disperso.<br>
+<hr>
+<br>
+<br>
+<h2 id="toc12"><a name="Tipos de índices-Con caducidad"></a>Con caducidad</h2>
+ <br>
+Son los llamados TTL (Time To Live). Se especifican con la opción {expireAfterSeconds:num.segundos} y sirven para <strong>borrar documentos</strong> transcurrido cierto tiempo (el tiempo que pase desde que se indexaron). Un ejemplo:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cosasquepasandeprisa</span>.<span class="me1">createIndex</span><span class="br0">(</span> <span class="br0">{</span> <span class="st0">"peticionEnEspera"</span><span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span> expireAfterSeconds<span class="sy0">:</span> <span class="nu0">3600</span> <span class="br0">}</span> <span class="br0">)</span>
+&nbsp;</pre>
+
+Cada documento que se inserte con una peticiónEnEspera se borrará después de una hora.<br>
+<br>
+<br>
+<br>
+<h2 id="toc13"><a name="Tipos de índices-En background"></a>En background</h2>
+ <br>
+La opción {background:true} hace que el índice se cree sin detener la lectura/escritura. La ventaja que tienen es que, contrariamente a los índices normales, no bloquean la lectura/escritura en la base de datos.<br>
+<br>
+<hr>
+<br>
+<strong><img src="./NoSQL-FdI - Índices en MongoDB_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>El índice tardará más tiempo en construirte. Además los índices background no son tan compactos.<br>
+<hr>
+<br>
+<hr>
+<strong><img src="./NoSQL-FdI - Índices en MongoDB_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>Aunque no bloquea la base de datos, la creación de un índice en background sí que bloque el shell desde el que se lanza hasta que termine su construcción.<br>
+<br>
+<hr>
+<br>
+<h2 id="toc14"><a name="Tipos de índices-Geoespaciales"></a>Geoespaciales</h2>
+ <br>
+En general las bases de datos NoSQL resultan adecuadas para búsquedas que tienen que ver con posiciones. MongoDB contiene sus propias librerías para este fin. No se crean con una opción especial sino con un "flag" tras la clave. Vamos a distinguir dos tipos:<br>
+<br>
+<h2 id="toc15"><a name="Tipos de índices-2d-plano"></a>2d-plano</h2>
+ <br>
+Para crear un índice en 2d necesitamos que los documentos tengan una clave que contenga un array de dos coordenadas. Algo así como:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">restaurants</span>.<span class="me1">insert</span><span class="br0">{</span>.... <span class="me1">posicion</span><span class="sy0">:</span><span class="br0">[</span><span class="nu0">23</span><span class="sy0">,-</span><span class="nu0">4</span><span class="br0">]</span>...<span class="br0">}</span></pre>
+
+<br>
+entonces podemos hacer<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">restaurants</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span> posicion<span class="sy0">:</span> <span class="st0">"2d"</span> <span class="br0">}</span><span class="br0">)</span></pre>
+
+El flag 2dsphere solo tiene sentido si location es una clave que contiene arrays con 2 números reales (la posición del objeto).<br>
+<br>
+Estos índices son útiles cuando se usan operadores especiales como $near<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">restaurants</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>posicion<span class="sy0">:</span><span class="br0">{</span>$near<span class="sy0">:</span><span class="br0">[</span><span class="nu0">50</span><span class="sy0">,</span><span class="nu0">50</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span>.<span class="me1">limit</span><span class="br0">(</span><span class="nu0">5</span><span class="br0">)</span></pre>
+
+<br>
+Devuelve los cercanos a la posición por orden de cercanía.<br>
+<br>
+Otra característica interesante es la posibilidad de consultar por los puntos que caen dentro de un polígono dado:<br>
+<br>
+Ejemplo: puntos dentro del tríangulo (1,1), (1.5, 2)<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">plano</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span> posicion<span class="sy0">:</span> <span class="br0">{</span> $geoWithin<span class="sy0">:</span> <span class="br0">{</span> $polygon<span class="sy0">:</span> <span class="br0">[</span> <span class="br0">[</span><span class="nu0">1</span><span class="sy0">,</span><span class="nu0">1</span> <span class="br0">]</span><span class="sy0">,</span> <span class="br0">[</span><span class="nu0">1.5</span><span class="sy0">,</span><span class="nu0">2</span><span class="br0">]</span><span class="sy0">,</span> <span class="br0">[</span> <span class="nu0">3</span> <span class="sy0">,</span> <span class="nu0">1</span> <span class="br0">]</span> <span class="br0">]</span> <span class="br0">}</span> <span class="br0">}</span>   <span class="br0">}</span> <span class="br0">)</span></pre>
+
+<br>
+Nota: esta operación no necesita índice<br>
+<br>
+<h2 id="toc16"><a name="Tipos de índices-2d-esférico"></a>2d-esférico</h2>
+ <br>
+En casos sencillos, o para aplicaciones sobre el plano, las coordenadas 2d están bien, pero si queremos distancias,etc., sobre el globo terrestre debemos usar las coordenadas "2dsphere", que están formada por parejas [longitud, latitud]<br>
+<ul><li>Longitud: Distancia en grados al meridiano de Grenwich. Se usa la notacion (-180,+180) (negativos al oeste, positivos al este)</li><li>Latitud: distancia en grados al ecuador (-90 hasta 90)</li></ul><br>
+Los documentos son un poco más complicados que en el caso anterior.<br>
+<br>
+Veamos un ejemplo:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">restaurants</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>
+    <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"El espagueti enrollado"</span><span class="sy0">,</span>
+    <span class="st0">"comida"</span> <span class="sy0">:</span> <span class="st0">"Italiana"</span><span class="sy0">,</span>
+    <span class="st0">"gps"</span> <span class="sy0">:</span> <span class="br0">{</span>
+        <span class="st0">"type"</span> <span class="sy0">:</span> <span class="st0">"Point"</span><span class="sy0">,</span>
+        <span class="st0">"coordinates"</span> <span class="sy0">:</span> <span class="br0">[</span>
+            <span class="nu0">12.5386254</span><span class="sy0">,</span>
+            <span class="nu0">41.8839509</span>
+        <span class="br0">]</span>
+    <span class="br0">}</span>
+<span class="br0">}</span><span class="br0">)</span></pre>
+
+La parte que nos interesa es la de la clave gps, que es la que usaremos para crear el índice.<br>
+<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">restaurants</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span> gps<span class="sy0">:</span> <span class="st0">"2dsphere"</span> <span class="br0">}</span><span class="br0">)</span></pre>
+
+El nombre de esta clave puede ser el que queramos (gps, lugar, localización...), pero lo que sí importa es la estructura del valor que la acompaña, que debe ser una valor admitido en <a class="wiki_link_ext" href="http://geojson.org/" rel="nofollow">GeoJSON</a>. En particular:<br>
+<br>
+<ul><li>El valor "type" puede ser "Point", "polygon", y varios más,</li><li>Si el valor "type" es "Point", entonces debe haber una clave coordinates, con valor un array de dos dimensiones, en la que el primer valor es la longitud (entre -180 y +180) y el segundo la latidud (entre -90 y 90)</li></ul><br>
+Ahora se pueden hacer consultas como:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">restaurants</span>.<span class="me1">find</span><span class="br0">(</span> <span class="br0">{</span> <span class="st0">'gps'</span> <span class="sy0">:</span> <span class="br0">{</span> $near <span class="sy0">:</span> <span class="br0">{</span>
+                                      $geometry<span class="sy0">:</span> <span class="br0">{</span> type<span class="sy0">:</span> <span class="st0">'Point'</span><span class="sy0">,</span> coordinates<span class="sy0">:</span> <span class="br0">[</span><span class="sy0">&lt;</span>lon<span class="sy0">&gt;,</span> <span class="sy0">&lt;</span>lat<span class="sy0">&gt;</span><span class="br0">]</span> <span class="br0">}</span> <span class="sy0">,</span>
+                                      $maxDistance<span class="sy0">:</span> <span class="sy0">&lt;</span>meters<span class="sy0">&gt;</span> <span class="br0">}</span><span class="br0">}</span> <span class="br0">}</span> <span class="br0">)</span><span class="sy0">;</span></pre>
+
+<br>
+que busca objetos alrededor de las coordenadas &lt;lon&gt;, &lt;lat&gt; dentro de un radio de &lt;meters&gt; metros. La sintaxis completa del comando es:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span>
+  $near<span class="sy0">:</span> <span class="br0">{</span>
+     $geometry<span class="sy0">:</span> <span class="br0">{</span>
+        type<span class="sy0">:</span> <span class="st0">"Point"</span> <span class="sy0">,</span>
+        coordinates<span class="sy0">:</span> <span class="br0">[</span> <span class="sy0">&lt;</span>longitude<span class="sy0">&gt;</span> <span class="sy0">,</span> <span class="sy0">&lt;</span>latitude<span class="sy0">&gt;</span> <span class="br0">]</span>
+     <span class="br0">}</span><span class="sy0">,</span>
+     $maxDistance<span class="sy0">:</span> <span class="sy0">&lt;</span>distance <span class="kw1">in</span> meters<span class="sy0">&gt;,</span>
+     $minDistance<span class="sy0">:</span> <span class="sy0">&lt;</span>distance <span class="kw1">in</span> meters<span class="sy0">&gt;</span>
+  <span class="br0">}</span>
+<span class="br0">}</span></pre>
+
+<br>
+<br>
+<br>
+<h2 id="toc17"><a name="Tipos de índices-Textuales"></a>Textuales</h2>
+ <br>
+Otra utilidad típica en bases de datos NoSQL (en realidad en cualquier base de datos) es almacenar y buscar texto. En este caso se usa el flag text:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">mistextos</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span>frase<span class="sy0">:</span><span class="st0">"text"</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+El resultado es un índice que tiene como elementos las palabras que 
+están contenidas en cada frase. El índice no tiene en cuenta mayúsculas (Berto y berto son consideradas iguales) y también intenta omitir repeticiones con plurales (en esto es menos hábil, ya que toma las reglas del inglés).<br>
+<br>
+En principio si queremos que sea específico para texto español podemos hacerlo;<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">mistextos</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span>frase<span class="sy0">:</span><span class="st0">"text"</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>default_language<span class="sy0">:</span><span class="st0">"spanish"</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+<br>
+<hr>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/programacion/images/bee.gif" alt="external image bee.gif" title="external image bee.gif"><span style="color: #005a35;">Aviso. L</span></strong>a opción "default_language" no funciona muy bien y de momento no es recomendable.<br>
+<hr>
+<br>
+<br>
+Las consultas basadas en el índice usan también find, pero tienen una estructura distinta.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">frases</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>$text<span class="sy0">:</span><span class="br0">{</span>$search<span class="sy0">:</span><span class="st0">"amor"</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+La siguiente consulta muestra las frases que tiene o bien amor o bien odio<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">frases</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>$text<span class="sy0">:</span><span class="br0">{</span>$search<span class="sy0">:</span><span class="st0">"amor odio"</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+<br>
+<br>
+<hr>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png"><span style="color: #005a35;">Pregunta. </span></strong>Hemos creado un índice textual sobre la clave <em>título</em> de la colección <em>películas</em>. Ahora hacemos la consulta:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">db.películas.find( { $text : {$search : "Viaje de Chihiro" } } )</pre>
+
+¿Cuáles de los siguientes documentos serán devueltos por la consulta?<br>
+<br>
+<ul><li>{ "título" : "Viaje a ninguna parte", dirigida:"Fernán Gómez"}</li><li>{"título": "Akira", dirigida: "Chihiro Matsue"}</li><li>{"titulo": "Nadie hablará de nosotras cuando hayamos muerto"}</li><li>{"título": "El viaje de Chihiro", tipo:"animación"}</li></ul><hr>
+<br>
+<br>
+<br>
+<br>
+<h1 id="toc18"><a name="Planes de ejecución"></a>Planes de ejecución</h1>
+ <br>
+Permiten saber si se está usando un índice al ejecutar alguna de las siguientes funciones:<br>
+<br>
+<ul><li>find</li><li>count</li><li>remove</li><li>update</li><li>group</li></ul><br>
+<br>
+<hr>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/programacion/images/bee.gif" alt="external image bee.gif" title="external image bee.gif"><span style="color: #005a35;">Aviso. </span>Las funciones de modificación (remove, update) no cambian la base de datos cuando se usan con explain</strong><br>
+<hr>
+<br>
+Explain se puede usar en tres modos. Vamos a ver cada uno por separado.<br>
+<h2 id="toc19"> </h2>
+ <h2 id="toc20"><a name="Planes de ejecución-queryPlanner"></a>queryPlanner</h2>
+ <br>
+El modo por defecto. Para ver el plan tenemos que incluir una llamada al método explain() antes del método que queremos probar.<br>
+<br>
+Por ejemplo, usando una colección coord de documentos con coordenadas {x,y}, podemos preguntar:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">coord</span>.<span class="me1">explain</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span><span class="nu0">15.23</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span>
+<span class="st0">"queryPlanner"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"plannerVersion"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+<span class="st0">"namespace"</span> <span class="sy0">:</span> <span class="st0">"banco.coord"</span><span class="sy0">,</span>
+<span class="st0">"indexFilterSet"</span> <span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+<span class="st0">"parsedQuery"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"x"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"$eq"</span> <span class="sy0">:</span> <span class="nu0">15.23</span>
+<span class="br0">}</span>
+<span class="br0">}</span><span class="sy0">,</span>
+<span class="st0">"winningPlan"</span> <span class="sy0">:</span> <span class="br0">{</span><span class="sy0">&lt;/</span>span<span class="sy0">&gt;</span>
+ <span class="st0">"stage"</span> <span class="sy0">:</span> <span class="st0">"COLLSCAN"</span><span class="sy0">,&lt;/</span>span<span class="sy0">&gt;</span>
+ <span class="st0">"filter"</span> <span class="sy0">:</span> <span class="br0">{</span><span class="sy0">&lt;/</span>span<span class="sy0">&gt;</span>
+ <span class="st0">"x"</span> <span class="sy0">:</span> <span class="br0">{</span><span class="sy0">&lt;/</span>span<span class="sy0">&gt;</span>
+ <span class="st0">"$eq"</span> <span class="sy0">:</span> <span class="nu0">15.23</span><span class="sy0">&lt;/</span>span<span class="sy0">&gt;</span>
+ <span class="br0">}</span><span class="sy0">&lt;/</span>span<span class="sy0">&gt;</span>
+ <span class="br0">}</span><span class="sy0">,&lt;/</span>span<span class="sy0">&gt;</span>
+ <span class="st0">"direction"</span> <span class="sy0">:</span> <span class="st0">"forward"</span><span class="sy0">&lt;/</span>span<span class="sy0">&gt;</span>
+ <span class="br0">}</span><span class="sy0">,&lt;/</span>span<span class="sy0">&gt;</span>
+ <span class="st0">"rejectedPlans"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="br0">]</span><span class="sy0">&lt;/</span>span<span class="sy0">&gt;</span>
+<span class="br0">}</span><span class="sy0">,</span>
+<span class="st0">"serverInfo"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"host"</span> <span class="sy0">:</span> <span class="st0">"puck"</span><span class="sy0">,</span>
+<span class="st0">"port"</span> <span class="sy0">:</span> <span class="nu0">27017</span><span class="sy0">,</span>
+<span class="st0">"version"</span> <span class="sy0">:</span> <span class="st0">"3.2.1"</span><span class="sy0">,</span>
+<span class="st0">"gitVersion"</span> <span class="sy0">:</span> <span class="st0">"a14d55980c2cdc565d4704a7e3ad37e4e535c1b2"</span>
+<span class="br0">}</span><span class="sy0">,</span>
+<span class="st0">"ok"</span> <span class="sy0">:</span> <span class="nu0">1</span>
+<span class="br0">}</span></pre>
+
+Podemos distinguir 4 partes dentro del plan:<br>
+<br>
+<ol><li>queryPlanner: Muestra la query en formato interno (parsedQuery), así como el nombre de la base de datos y la colección.</li><li>winningPlan: Es seguramente la parte más importante. Es el plan escogido e Indica cómo ha organizado MongoDB la búsqueda de los documentos.</li><li>rejectedPlans: Indica otros planes de ejecución posibles que han sido desechados por ser menos eficientes</li><li>serverInfo: Lugar donde se ha desarrollado la consulta, y datos sobre la versión de mongo</li></ol><br>
+Finalmente el valor ok indica que la operación tuvo éxito.<br>
+<br>
+La parte en rojo, el plan elegido, indica que se ha hecho un recorrido de la tabla sin índices (COLLSCAN). Posibles valores de stage;<br>
+<br>
+<ul><li>IXSCAN: Recorrido basado en índices</li><li>FETCH: se recorre un resultado anterior, normalmente buscando los valores que cumplen un cierto filtro</li><li>KEEP:MUTATION: Parece análogo al anterior, pero no encuentro <a class="wiki_link_ext" href="https://jira.mongodb.org/browse/SERVER-20299" rel="nofollow">documentación</a> que lo describa de una forma comprensible!</li><li>COLLSCAN: se recorre una colección entera</li><li>PROJECTION: Se hace una proyección de los datos obtenidos en una etapa anterior</li><li>SORT: Ha habido que hacer una ordenación en memoria (muy lenta)</li><li>SHARD_MERGED: solo cuando se trabaja en clúster. Indica que a información está en principio en varias particiones, ha habido que examinarlas por separado y al final mezclar los resultados.</li><li>SHARDING_FILTER: Filtro de una partición</li><li>SINGLE_SHARD: Solo ha habido que examinar un miembro de la partición</li></ul><br>
+Podemos usar explain como un objeto:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">explica <span class="sy0">=</span> db.<span class="me1">coord</span>.<span class="me1">explain</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+que podemos usar en cualquier momento:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">explica.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span><span class="nu0">15.23</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+y obtenemos la misma información.<br>
+<br>
+<h2 id="toc21"><a name="Planes de ejecución-executionStats"></a>executionStats</h2>
+ <br>
+Si queremos más información tenemos que usar de executionStats:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">explica <span class="sy0">=</span> db.<span class="me1">coord</span>.<span class="me1">explain</span><span class="br0">(</span><span class="st0">"executionStats"</span><span class="br0">)</span></pre>
+
+<br>
+y<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">explica.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span><span class="nu0">15.23</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+ahora devuelve un información mucho más detallada, con datos como el número de documentos y el tiempo requerido.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="st0">"executionStats"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"executionSuccess"</span> <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span>
+<span class="st0">"nReturned"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"executionTimeMillis"</span> <span class="sy0">:</span> <span class="nu0">125</span><span class="sy0">,</span>
+<span class="st0">"totalKeysExamined"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"totalDocsExamined"</span> <span class="sy0">:</span> <span class="nu0">420023</span><span class="sy0">,</span>
+<span class="st0">"executionStages"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"stage"</span> <span class="sy0">:</span> <span class="st0">"COLLSCAN"</span><span class="sy0">,</span>
+<span class="st0">"filter"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"x"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"$eq"</span> <span class="sy0">:</span> <span class="nu0">15.23</span>
+<span class="br0">}</span>
+<span class="br0">}</span><span class="sy0">,</span>
+<span class="st0">"nReturned"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"executionTimeMillisEstimate"</span> <span class="sy0">:</span> <span class="nu0">120</span><span class="sy0">,</span></pre>
+
+<br>
+La consulta ha examinado 420023 documentos en 125 milisegundos.<br>
+<br>
+Veamos cómo cambia si creamos un índice:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">explica.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span><span class="nu0">15.23</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span>
+<span class="st0">"queryPlanner"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"plannerVersion"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+<span class="st0">"namespace"</span> <span class="sy0">:</span> <span class="st0">"banco.coord"</span><span class="sy0">,</span>
+<span class="st0">"indexFilterSet"</span> <span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+<span class="st0">"parsedQuery"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"x"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"$eq"</span> <span class="sy0">:</span> <span class="nu0">15.23</span>
+<span class="br0">}</span>
+<span class="br0">}</span><span class="sy0">,</span>
+<span class="st0">"winningPlan"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"stage"</span> <span class="sy0">:</span> <span class="st0">"FETCH"</span><span class="sy0">,</span>
+<span class="st0">"inputStage"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"stage"</span> <span class="sy0">:</span> <span class="st0">"IXSCAN"</span><span class="sy0">,</span>
+<span class="st0">"keyPattern"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">1</span>
+<span class="br0">}</span><span class="sy0">,</span>
+<span class="st0">"indexName"</span> <span class="sy0">:</span> <span class="st0">"x_1"</span><span class="sy0">,</span>
+<span class="st0">"isMultiKey"</span> <span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+<span class="st0">"isUnique"</span> <span class="sy0">:</span> <span class="kw2">false</span><span class="sy0">,</span>
+....
+<span class="st0">"executionStats"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"executionSuccess"</span> <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span>
+<span class="st0">"nReturned"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"executionTimeMillis"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"totalKeysExamined"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"totalDocsExamined"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"executionStages"</span> <span class="sy0">:</span> <span class="br0">{</span>
+<span class="st0">"stage"</span> <span class="sy0">:</span> <span class="st0">"FETCH"</span><span class="sy0">,</span>
+<span class="st0">"nReturned"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"executionTimeMillisEstimate"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"works"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+<span class="st0">"advanced"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"needTime"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"needYield"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"saveState"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+<span class="st0">"restoreState"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span></pre>
+
+<br>
+En este caso tenemos que se ha usado el índice y que ha tardado 0 ms (lo que significa menos de 1ms). También es llamativo ver que ha necesitado mirar 0 documentos, es decir el propio índice ha permitido llegar a la conclusión de que ningún documento cumple la condición find.<br>
+<br>
+<h2 id="toc22"> </h2>
+ <h2 id="toc23"><a name="Planes de ejecución-allPlansExecution"></a>allPlansExecution</h2>
+ <br>
+<br>
+<em>allPlansExecution</em> muestra todos planes, tanto el ganador como los desechados es muy útil para decidir qué indice va mejor. Muestra un análisis de todos los posibles planes.<br>
+<br>
+<br>
+<hr>
+<br>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png"><span style="color: #005a35;">Pregunta. </span></strong>Supón que tenemos<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">foo</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>b<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>c<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">foo</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="st0">"sports"</span><span class="sy0">,</span> b<span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">100</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+Y no ha más índices creados. Entonces:<br>
+<br>
+a) Hace falta acceder directamente a los documentos<br>
+b) No se llega a acceder a los documentos; bastan los accesos al índice para mostrar el resultado<br>
+<br>
+¿Y si la consulta fuera:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">foo</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="st0">"sports"</span><span class="sy0">,</span> b<span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">100</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span> b<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span> _id<span class="sy0">:</span><span class="nu0">0</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+?<br>
+<br>
+¿Y si la consulta fuera:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">foo</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="st0">"sports"</span><span class="sy0">,</span> b<span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">100</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>_id<span class="sy0">:</span><span class="nu0">0</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+?<br>
+<br>
+Las consultas que no necesitan acceder a los documentos se llaman "consultas cubiertas" y son mucho más rápidas.<br>
+<hr>
+<br>
+<h1 id="toc24"><a name="Consejos sobre índices"></a>Consejos sobre índices</h1>
+ <br>
+<ul><li>Cuantos más índices --&gt; consultas más rápidas</li><li>Cuantos más índices --&gt; escrituras más lentas</li><li>En el caso de importaciones masivas es mas rápido crear los índices al final</li><li>Índices tan grandes que no quepan en memoria pueden ser de menos utilidad. Esta información la podemos encontrar con el comando <em>db.coleccion.stats()</em> o directamente <em>db.coleccion.totalIndexSize()</em></li><li>Dada una consulta si hay que elegir:<ul><li>el primer candidato para indexar es alguna clave que contenga una igualdad, si la hay</li><li>El segundo es alguna clave incluida en un sort</li><li>Finalmente las claves que impliquen un rango (mayor o menor)</li></ul></li></ul><br>
+Hay que ser cuidadosos al crear índices, hacerlo solo para consultas realmente repetidas.<br>
+<br>
+Cuando hay varios índices MongoDB pone una "simulacion" de planes usando cada uno de ellos, a ver cuál gana (en realidad es un poco más complicado, hay varios criterios)<br>
+<br>
+<hr>
+<br>
+<strong><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png"><span style="color: #005a35;">Pregunta. </span></strong>Supón que tenemos una colección tururu con un solo índice:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">tururu</span>.<span class="me1">createIndex</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>b<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>c<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+¿Cuál(es) de las siguientes consultas harán uso del índice?<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">tururu</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span> c <span class="sy0">:</span> <span class="st0">"No"</span> <span class="br0">}</span> <span class="br0">)</span>.<span class="me1">sort</span><span class="br0">(</span> <span class="br0">{</span> a <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> b <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span> <span class="br0">)</span>
+db.<span class="me1">tururu</span>.<span class="me1">find</span><span class="br0">(</span> <span class="br0">{</span>c<span class="sy0">:</span> <span class="st0">"puedo"</span><span class="br0">}</span><span class="br0">)</span>.<span class="me1">sort</span><span class="br0">(</span><span class="br0">{</span>a<span class="sy0">:-</span><span class="nu0">1</span><span class="sy0">,</span> b<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">tururu</span>.<span class="me1">find</span><span class="br0">(</span> <span class="br0">{</span> b <span class="sy0">:</span> <span class="st0">"vivir"</span><span class="sy0">,</span> c <span class="sy0">:</span> <span class="st0">"sin"</span> <span class="br0">}</span> <span class="br0">)</span>
+db.<span class="me1">tururu</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span> a <span class="sy0">:</span> <span class="st0">"ti"</span> <span class="br0">}</span> <span class="br0">)</span></pre>
+
+<hr>
+<br>
+<br>
+<br>
+<br>
+<h1 id="toc25"><a name="Profiler"></a>Profiler</h1>
+ <br>
+El profiler da datos sobre la eficiencia de las operaciones. El nivel del profiles se fija mediante al comando de shell db.setProfilingLevel(level) donde<br>
+<ul><li>0 --&gt; desactivado (opción por defecto)</li><li>1 --&gt;muestra solo información sobre operaciones lentas.</li><li>2 --&gt; activado, hace profiling de toda la información</li></ul><br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">setProfilingLevel</span><span class="br0">(</span><span class="nu0">2</span><span class="br0">)</span></pre>
+
+Así lo activamos<br>
+<br>
+La información se graba en una colección system.profile para la base de datos. Podemos consultarla:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">system</span>.<span class="me1">profile</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">pretty</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+Entre la información por ejemplo 'op' indica el tipo de operación que se ha realizado en los comandos shell.<br>
+<br>
+Por ejemplo, el siguiente comando nos muestra los comandos que han tardado más de 1milisegundo, y ordena la salida en el orden en que han ocurrido:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">system</span>.<span class="me1">profile</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>millis<span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">10</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>.<span class="me1">sort</span><span class="br0">(</span><span class="br0">{</span>ts<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span>.<span class="me1">pretty</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+<br>
+Para guardar información solo de los comandos que tarden más de 10 milisegundos<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">setProfilingLevel</span><span class="br0">(</span><span class="nu0">10</span><span class="br0">)</span></pre>
+
+<br>
+<br>
+<hr>
+<br>
+<strong><img src="./NoSQL-FdI - Índices en MongoDB_files/diamond(1).gif" alt="external image diamond.gif" title="external image diamond.gif"><span style="color: #005a35;">Observación </span></strong>Tener activado el profiling siempre activado puede ralentizar un poco el sistema, pero no provoca desbordamiento de memoria porque nunca ocupa más de 1Mb. No tiene índices ni usa _id<br>
+<hr>
+<br>
+<br>
+<hr>
+<br>
+<strong><img src="./NoSQL-FdI - Índices en MongoDB_files/diamond(1).gif" alt="external image diamond.gif" title="external image diamond.gif"><span style="color: #005a35;">Observación </span></strong>Otra forma de hacer profiling es usar las herramientas Mongotop y mongostat<br>
+<ul><li>Mongotop se llama con un tiempo de refresco y muestra accesos de lectura, escritura y modificación</li><li>mongostat: Información detallada de accesos ver (<a class="wiki_link_ext" href="http://docs.mongodb.org/manual/reference/program/mongostat" rel="nofollow">docs.mongodb.org/manual/reference/program/mongostat</a>) para más detalles</li></ul><hr>
+<br>
+<br>
+<br>
+<br>
+<h1 id="toc26"><a name="Enlaces"></a>Enlaces</h1>
+ <br>
+<a class="wiki_link_ext" href="http://www.minet.uni-jena.de/dbis/lehre/ws2005/dbs1/Bayer_hist.pdf" rel="nofollow">Artículo original presentado los árboles-B (1972)</a><br>
+<a class="wiki_link_ext" href="http://www.cs.carleton.edu/faculty/jgoldfea/cs201/spring11/inclass/Tree/BTreefinalNew.pdf" rel="nofollow">Apuntes sobre árboles-B</a><br>
+<a class="wiki_link_ext" href="https://docs.mongodb.org/manual/administration/indexes-geo/" rel="nofollow">Tutorial sobre las posibilidades geoespaciales de MongoDB</a><br>
+<a class="wiki_link_ext" href="http://geojson.org/" rel="nofollow">GeoJSON</a>: la variante de JSON para datos espaciales<br>
+<br>
+<br>
+<hr>
+<a class="wiki_link" href="http://gpd.sip.ucm.es/rafa/docencia/nosql/index.html">Página principal MongoDB</a><br>
+<hr>
+
+    </div>
+  
+
+</body></html>

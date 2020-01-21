@@ -1,0 +1,2784 @@
+
+<!-- saved from url=(0051)http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>MongoDB - CRUD</title>
+      
+
+    <link rel="stylesheet" href="./MongoDB - CRUD_files/style.css" type="text/css">
+    
+<link id="avast_os_ext_custom_font" href="chrome-extension://eofcbnmajmjmplflapaojjnihcjkigck/common/ui/fonts/fonts.css" rel="stylesheet" type="text/css"></head>
+
+<body style="background-color: rgb(255, 255, 255);" link="#000099">
+<b><font size="-1"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/index.html"><img src="./MongoDB - CRUD_files/nosqllogo.png" width="60"> Bases de Datos NoSQL - RafaC - 2017/2018</a></font>
+</b> <br>
+    <div class="wiki" id="content_view" style="display: block;">
+<h2 id="toc0"> </h2>
+ <img src="https://gpd.sip.ucm.es/rafa/docencia/images/logo-mongodb-tagline.png" alt="external image logo-mongodb-tagline.png" title="external image logo-mongodb-tagline.png"><br>
+<h1 id="toc0"> </h1>
+ <div id="toc"><h1 class="nopad">Índice</h1><div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#toc0"> </a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Insert">Insert</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find,skip,limit">find,skip,limit</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Sort">Sort</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle">find en detalle</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#toc5"> </a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Proyecciones">Proyecciones</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Consultas%20B%C3%A1sicas">Consultas Básicas</a></div>
+<div style="margin-left: 6em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#toc8"> </a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Operadores">Operadores</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#toc10"> </a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Operadores-$or,%20$and">$or, $and</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#toc12"> </a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Operadores-$exists">$exists</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#toc14"> </a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Operadores-$type">$type</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Operadores-$regex">$regex</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Operadores-$where">$where</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Operadores-$expr">$expr</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-arrays">arrays</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-arrays-$all,%20$in,%20$nin,%20$elemMatch,%20$not">$all, $in, $nin, $elemMatch, $not</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-arrays-$all">$all</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-arrays-$in">$in</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-arrays-$nin">$nin</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-arrays-Posiciones">Posiciones</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-arrays-$elemMatch">$elemMatch</a></div>
+<div style="margin-left: 3em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-arrays-proyecciones">Proyecciones</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#find%20en%20detalle-Subcomponentes">Subcomponentes</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Variables">Variables</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#otras">Otras consultas: distinct, count</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Update">Update</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Update-Update%20total">Update total</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Update-Update%20parcial">Update parcial</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Update-Arrays">Arrays</a></div>
+<div style="margin-left: 2em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Update-Multiupdates">Multiupdates</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#toc32"> </a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Remove">Remove</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#toc34"> </a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Bulk">Bulk</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Dise%C3%B1o%20de%20colecciones">Diseño de colecciones</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/crud.html#Colecciones%20truncadas">Colecciones truncadas</a></div>
+
+<br>
+<br>
+Normalmente en las bases de datos, hablamos de operaciones <i>CRUD</i> (Create, Read, Insert y Delete)<br>
+<br>
+En Mongo estos son los nombres asociados a<br>
+<br>
+
+
+<table class="wiki_table">
+    <tbody><tr>
+        <td><strong>Operación</strong><br>
+</td>
+        <td><span style="color: #0000ff;">Nombre en MongoDB</span><br>
+</td>
+    </tr>
+    <tr>
+        <td>Create<br>
+</td>
+        <td><span style="background-color: #ffff00; color: #0000ff;">Insert</span><br>
+</td>
+    </tr>
+    <tr>
+        <td>Read<br>
+</td>
+        <td><span style="background-color: #ffff00; color: #0000ff;">Find</span><br>
+</td>
+    </tr>
+    <tr>
+        <td>Update<br>
+</td>
+        <td><span style="background-color: #ffff00; color: #0000ff;">Update</span><br>
+</td>
+    </tr>
+    <tr>
+        <td>Delete<br>
+</td>
+        <td><span style="background-color: #ffff00; color: #0000ff;">Remove</span><br>
+</td>
+    </tr>
+</tbody></table>
+
+<br>
+<br>
+<br>
+<h1 id="toc1"><a name="Insert"></a>Insert</h1>
+ <br>
+Para crear una colección e insertar valores hay al menos 4 posibilidades<br>
+<br>
+La primera es usar la herramienta import explicada más abajo. En el resto del capítulo a menudo utilizaremos a menudo la<a class="wiki_link_ext" href="https://docs.mongodb.org/getting-started/shell/import-data/" rel="nofollow"> colección "restaurants"</a> que viene de ejemplo con Mongo, y que tiene una estructura de la forma:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span>
+  <span class="st0">"address"</span><span class="sy0">:</span> <span class="br0">{</span>
+     <span class="st0">"building"</span><span class="sy0">:</span> <span class="st0">"1007"</span><span class="sy0">,</span>
+     <span class="st0">"coord"</span><span class="sy0">:</span> <span class="br0">[</span> <span class="sy0">-</span><span class="nu0">73.856077</span><span class="sy0">,</span> <span class="nu0">40.848447</span> <span class="br0">]</span><span class="sy0">,</span>
+     <span class="st0">"street"</span><span class="sy0">:</span> <span class="st0">"Morris Park Ave"</span><span class="sy0">,</span>
+     <span class="st0">"zipcode"</span><span class="sy0">:</span> <span class="st0">"10462"</span>
+  <span class="br0">}</span><span class="sy0">,</span>
+  <span class="st0">"borough"</span><span class="sy0">:</span> <span class="st0">"Bronx"</span><span class="sy0">,</span>
+  <span class="st0">"cuisine"</span><span class="sy0">:</span> <span class="st0">"Bakery"</span><span class="sy0">,</span>
+  <span class="st0">"grades"</span><span class="sy0">:</span> <span class="br0">[</span>
+     <span class="br0">{</span> <span class="st0">"date"</span><span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"$date"</span><span class="sy0">:</span> <span class="nu0">1393804800000</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"grade"</span><span class="sy0">:</span> <span class="st0">"A"</span><span class="sy0">,</span> <span class="st0">"score"</span><span class="sy0">:</span> <span class="nu0">2</span> <span class="br0">}</span><span class="sy0">,</span>
+     <span class="br0">{</span> <span class="st0">"date"</span><span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"$date"</span><span class="sy0">:</span> <span class="nu0">1378857600000</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"grade"</span><span class="sy0">:</span> <span class="st0">"A"</span><span class="sy0">,</span> <span class="st0">"score"</span><span class="sy0">:</span> <span class="nu0">6</span> <span class="br0">}</span><span class="sy0">,</span>
+     <span class="br0">{</span> <span class="st0">"date"</span><span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"$date"</span><span class="sy0">:</span> <span class="nu0">1358985600000</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"grade"</span><span class="sy0">:</span> <span class="st0">"A"</span><span class="sy0">,</span> <span class="st0">"score"</span><span class="sy0">:</span> <span class="nu0">10</span> <span class="br0">}</span><span class="sy0">,</span>
+     <span class="br0">{</span> <span class="st0">"date"</span><span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"$date"</span><span class="sy0">:</span> <span class="nu0">1322006400000</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"grade"</span><span class="sy0">:</span> <span class="st0">"A"</span><span class="sy0">,</span> <span class="st0">"score"</span><span class="sy0">:</span> <span class="nu0">9</span> <span class="br0">}</span><span class="sy0">,</span>
+     <span class="br0">{</span> <span class="st0">"date"</span><span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"$date"</span><span class="sy0">:</span> <span class="nu0">1299715200000</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"grade"</span><span class="sy0">:</span> <span class="st0">"B"</span><span class="sy0">,</span> <span class="st0">"score"</span><span class="sy0">:</span> <span class="nu0">14</span> <span class="br0">}</span>
+  <span class="br0">]</span><span class="sy0">,</span>
+  <span class="st0">"name"</span><span class="sy0">:</span> <span class="st0">"Morris Park Bake Shop"</span><span class="sy0">,</span>
+  <span class="st0">"restaurant_id"</span><span class="sy0">:</span> <span class="st0">"30075445"</span>
+<span class="br0">}</span></pre>
+
+<br>
+<br>
+La segunda forma de crear una colección es simplemente insertar el primero elemento<br>
+<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>
+    nombre<span class="sy0">:</span><span class="st0">"bertoldo"</span><span class="sy0">,</span>
+    calle<span class="sy0">:</span><span class="st0">"General Jamón, num. 3.141592"</span><span class="sy0">,</span>
+    cuentas<span class="sy0">:</span><span class="br0">[</span> <span class="br0">{</span>num<span class="sy0">:</span><span class="st0">"001"</span><span class="sy0">,</span> saldo<span class="sy0">:</span><span class="nu0">2000</span><span class="sy0">,</span> compartida<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="sy0">,</span>
+         <span class="br0">{</span>num<span class="sy0">:</span><span class="st0">"002"</span><span class="sy0">,</span> saldo<span class="sy0">:</span><span class="nu0">100</span><span class="sy0">,</span> compartida<span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">]</span><span class="sy0">,</span>
+    datoscontacto<span class="sy0">:</span><span class="br0">{</span> email<span class="sy0">:</span><span class="st0">"bertoldo@ucm.es"</span><span class="sy0">,</span> telfs<span class="sy0">:</span><span class="br0">{</span>fijo<span class="sy0">:</span><span class="st0">"913421234"</span><span class="sy0">,</span> movil<span class="sy0">:</span><span class="br0">[</span><span class="st0">"5655555"</span><span class="sy0">,</span><span class="st0">"444444"</span><span class="br0">]</span><span class="br0">}</span> <span class="br0">}</span>
+<span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+<a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/files/banca.json">banca.json</a><br>
+<br>
+La tercera forma de crear una colección, muy útil para pruebas desde el shell es emplear la instrucción <i>for</i> de Javascript:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw1">for</span> <span class="br0">(</span><span class="kw2">var</span> i<span class="sy0">=</span><span class="nu0">0</span><span class="sy0">;</span> i<span class="sy0">&lt;</span><span class="nu0">200000</span><span class="sy0">;</span> i<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span>db.<span class="me1">coord</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span>i<span class="sy0">,</span>y<span class="sy0">:</span>i<span class="sy0">/</span><span class="nu0">2</span><span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span><span class="br0">}</span></pre>
+
+<br>
+Si queremos insertar muchos valores puede ser útil definir una función Javascript<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">function</span> nuevasCoord<span class="br0">(</span>x<span class="sy0">,</span>y<span class="br0">)</span> <span class="br0">{</span>
+db.<span class="me1">coord</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span>x<span class="sy0">,</span>y<span class="sy0">:</span>y<span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre>
+
+<br>
+Y ahora simplemente llamamos a la función:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">nuevasCoord<span class="br0">(</span><span class="nu0">10</span><span class="sy0">,</span><span class="nu0">11</span><span class="br0">)</span></pre>
+
+<br>
+En la shell se puede preguntar en cualquier momento por el número de documentos que contiene una colección.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">coord</span>.<span class="me1">count</span><span class="br0">(</span><span class="br0">)</span>
+<span class="nu0">200001</span></pre>
+
+<br>
+<hr>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>Completa la función que añade todos los puntos con coordenadas {lax,0}...{lax,n}:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">function</span> nuevaCoord<span class="br0">(</span>lax<span class="sy0">,</span> n<span class="br0">)</span> <span class="br0">{</span>....<span class="br0">}</span></pre>
+
+<hr>
+<br>
+<hr>
+<img src="./MongoDB - CRUD_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: Un documento en Mongo no puede ocupar más de 16 MB<br>
+<hr>
+<br>
+La última posibilidad es insertar un array de documentos de forma simultánea:<br>
+<br>
+
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">m102</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">[</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>b<span class="sy0">:</span><span class="nu0">2</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>c<span class="sy0">:</span><span class="nu0">3</span><span class="br0">}</span> <span class="br0">]</span><span class="br0">)</span></pre>
+
+<br>
+<hr>
+<strong><img src="./MongoDB - CRUD_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>A partir de la versión 3.2 si se va a insertar solo un documento se prefiere el uso de insertOne al de insert.<br>
+<hr>
+<br>
+<br>
+<hr>
+<strong><img src="./MongoDB - CRUD_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> Ojo:</strong> <span style="color: #005a35;">Para cargas masivas siempre mejor utilizar mongo import o las operaciones <a href="https://docs.mongodb.com/manual/core/bulk-write-operations/">bulk</a> </span><br>
+<hr>
+<br>
+
+<h1 id="toc2"><a name="find,skip,limit"></a>find,skip,limit</h1>
+ <br>
+Para mostrar por pantalla <strong>todos</strong> los documentos de una colección:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">coord</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+<br>
+Inicialmente solo muestra los 10 primeros documentos. Para ver más teclear <em>it</em>.<br>
+<br>
+<hr>
+<strong><img src="./MongoDB - CRUD_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>find devuelve un cursor, que puede verse como un iterador. It significa "iterate", es decir avanza el cursor a los siguientes resultados.<br>
+<hr>
+A menudo los documentos son demasiado complejos y difíciles de ver de un solo vistazo:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+<br>
+Se puede mejorar diciendo al shell que lo imprima bien indentado:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">pretty</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+<br>
+<hr>
+<strong><img src="./MongoDB - CRUD_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación : </span></strong>En el shell es muy normal encadenar funciones con "." . En cualquier momento podemos añadir help() al final para ver las opciones disponibles. Por ejemplo: db.cuentas.find().pretty().help()<br>
+<hr>
+<br>
+<br>
+Otra forma más elegante de mostrar la información es mediante arrays, que además pueden sernos útiles para consultas complejas:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">toArray</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+que transfiere la colección a un array javascript y lo muestra de forma ordenada.<br>
+<br>
+<hr>
+<img src="./MongoDB - CRUD_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: db.restaurants.find().toArray() transfiere todos los docs. de la colección a un array. ¡No usarlo con colecciones grandes!<br>
+<hr>
+<br>
+si se quiere hacer un array con solo los 2 primeros elementos se puede limitar:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">limit</span><span class="br0">(</span><span class="nu0">2</span><span class="br0">)</span>.<span class="me1">toArray</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+También se pueden "saltar" saltar unos cuantos resultados. Digamos que queremos los documentos que ocupan las posiciones 2 y 3, ambas incluídas:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">limit</span><span class="br0">(</span><span class="nu0">2</span><span class="br0">)</span>.<span class="me1">skip</span><span class="br0">(</span><span class="nu0">1</span><span class="br0">)</span>.<span class="me1">pretty</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+<br>
+Si solo queremos el primer elemento, podemos usar findOne:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">db.cuentas.findOne()</pre>
+
+<hr>
+<strong><img src="./MongoDB - CRUD_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>findOne siempre devuelve un único documento. Si no hay ninguno que cumpla la query devolverá el documento vacío, <strong>null</strong>, mientras que find(), que devuelve un cursor simplemente no devolverá nada.<br>
+<hr>
+<br>
+<br>
+<h1 id="toc3"><a name="Sort"></a>Sort</h1>
+ <br>
+Para ordenar usaremos la estructura db.coleccion.find(.....).sort(...) - Dentro de sort pondremos un criterio de ordenación que en general serán de la forma {clave:1} (ascendente) o {clave:-1} (descendente)<br>
+<br>
+Ejemplo:mostrar los restaurantes en orden ascendente por nombre. Si hay varios con el mismo nombre usar orden descendente en el tipo de cocina.<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">coord</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">sort</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span> y<span class="sy0">:-</span><span class="nu0">1</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+<hr>
+<img src="./MongoDB - CRUD_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: Los documentos que no contengan alguna de las claves usadas en la ordenación se ponen al principio si es ascendente o al final si es descendente<br>
+<hr>
+<br>
+<hr>
+<strong><img src="./MongoDB - CRUD_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>Siempre que se pongan skip, sort y limit . El orden en el que se ejecutan es el mismo: primero sort,luego skip y luego limit<br>
+<hr>
+<br>
+<br>
+<h1 id="toc4"><a name="find en detalle"></a>find en detalle</h1>
+ <br>
+<br>
+Es hora de ver en más detalle el método find. Su forma general tiene dos parámetros:<br>
+<br>
+<span style="font-size: 130%;">find(consulta, proyección)</span><br>
+<br>
+Lo mismo vale para findOne. La consulta indica qué documentos se deben seleccionar, y la proyección que información mostrar de los documentos seleccionados.<br>
+<br>
+Si solo se incluye un parámetro se supone que es la consulta y la proyección serían todos los datos del documento. Si no se incluye ningún elemento se asumiría, como ya hemos visto, la consulta que devuelve todos los documentos (una especie de <em>findall</em>).<br>
+<br>
+Empezamos por la parte más fácil, la proyección<br>
+<h1 id="toc5"> </h1>
+ <h2 id="toc6"><a name="find en detalle-Proyecciones"></a>Proyecciones</h2>
+ <br>
+También tienen la forma de un documento JSON. Indican que información se mostrará de los documentos obtenidos por la consulta.<br>
+<br>
+<hr>
+<img src="./MongoDB - CRUD_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"><span style="color: #005a35;">Observación </span>La proyección no cambian el número de documentos que se mostrarán (esto es misión de la consulta y de funciones como limit y skip). Lo que cambia la proyección es qué pares clave:valor se muestran<br>
+<hr>
+<br>
+Las reglas básicas de la proyección son las siguientes:<br>
+<ul><li>{ } muestra todos los pares clave:valor</li><li>{clave1:true,...,claven:true}:muestra solo las claves 1...n (y además la clave _id)</li><li>{clave1:false,...,claven:false}:muestra todas las claves salvo la 1..n (y además la clave _id)</li></ul><br>
+No se pueden mezclar valores true y false, con una excepción; en el caso de documento con valores true se puede añadir "_id":false para indicar que no queremos que se muestre el identificador.<br>
+<br>
+<h2 id="toc7"><a name="find en detalle-Consultas Básicas"></a>Consultas Básicas</h2>
+ Empezamos viendo las consultas, que toman la forma de un documento JSON. Se pueden comparar a la sección <em>where</em> de una consulta <em>SQL</em> . Sirven para seleccionar un subconjunto de documentos de una colección (aquellos que cumplen la condición expresada por la consulta).<br>
+<br>
+<ul><li>El documento vacío { } visto como consulta equivale a aceptar todos los miembros de la colección. Por ejemplo,<br>
+db.restaurants.findOne({ }) es equivalente a db.restaurants.findOne() .</li></ul><br>
+<ul><li>{a:b} se entiende como "selecciona los documentos en los que la clave 'a' toma el valor 'b'". En SQL sería "where a=b".<br>
+En caso de que "a" sea un array busca que contenga el valor "b".</li></ul>Ejemplo: vamos a encontrar 4 panaderías ("cuisine" : "Bakery")<br>
+en la lista de restaurantes<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">restaurants</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span> <span class="st0">"cuisine"</span> <span class="sy0">:</span> <span class="st0">"Bakery"</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span><span class="st0">"name"</span><span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>.<span class="me1">limit</span><span class="br0">(</span><span class="nu0">4</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"Morris Park Bake Shop"</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"Olive'S"</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"Tropical House Baking Co."</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"Cousin John'S Cafe And Bakery"</span> <span class="br0">}</span></pre>
+
+<ul><li>Se pueden poner varias condiciones simplemente añadiendo varias parejas clave/valor. Ejemplo: encontrar 4 panaderías en el barrio de Brooklyn:</li></ul>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">&gt; db.restaurants.find({ "cuisine" : "Bakery","borough" : "Brooklyn"},{"name":1,"_id":0}).limit(4)
+{ "name" : "Tropical House Baking Co." }
+{ "name" : "Cousin John'S Cafe And Bakery" }
+{ "name" : "Michael'S Pastry Shop" }
+{ "name" : "Fortunato Bros Cafe &amp; Bakery" }</pre>
+
+<h6 id="toc8"> </h6>
+ <h2 id="toc9"><a name="find en detalle-Operadores"></a>Operadores</h2>
+ <br>
+En lugar de la igualdad se pueden usar operadores como precio:{$gte:50} , que busca documentos incluyendo claves de la forma precio:v tales que v&gt;=50. La <a class="wiki_link_ext" href="https://docs.mongodb.org/manual/reference/operator/query/" rel="nofollow">lista completa de operadores</a> incluye de comparación, lógicos, de evaluación y muchos otros. Ejemplo:<br>
+<ul><ul><li>Restaurantes que no sean Mexicanos en "3 Avenue":<br>
+<span style="background-color: #eeeeee;"> db.restaurants.find({"address.street":"3 Avenue", "cuisine" : {$ne:"Mexican"}},{}). </span>El operador $ne significa "no es igual".</li><li>En la colección de coordenadas creada más arriba (donde cada documento incluye valores para x e y) encontrar valores de x&lt;5 tales que y&gt;6<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">coord</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">5</span><span class="br0">}</span><span class="sy0">,</span> y<span class="sy0">:</span><span class="br0">{</span>$lt<span class="sy0">:</span><span class="nu0">6</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">6</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">3</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">7</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">3.5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">8</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">4</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">9</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">4.5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">10</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">5.5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">6</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">3</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">7</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">3.5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">8</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">4</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">9</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">4.5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">10</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">5.5</span> <span class="br0">}</span></pre>
+
+</li><li>En la colección de coordenadas, encontrar valores tales que 3&lt;x&lt;5:</li></ul></ul>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">coord</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>x<span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">3</span><span class="sy0">,</span> $lt<span class="sy0">:</span><span class="nu0">5</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">4</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">2</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">4</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">2</span> <span class="br0">}</span></pre>
+
+<hr>
+<br>
+<img src="./MongoDB - CRUD_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: Obsérvese que las dos restricciones para la misma variable forman parte del mismo documento, para no repetir claves.<br>
+<hr>
+<br>
+<ul><ul><li>En la base de datos de bancos, buscar los clientes que empiezan por "B".<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="br0">{</span>$gte<span class="sy0">:</span><span class="st0">"B"</span><span class="sy0">,</span> $lt<span class="sy0">:</span><span class="st0">"C"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span><span class="st0">"nombre"</span><span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span> <span class="br0">}</span>.</pre>
+
+</li></ul></ul><h1 id="toc10"> </h1>
+ <br>
+<hr>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>Cual de las siguientes consultas devolver los documentos con 'score' entre 50 y 60, ambos inclusive?<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">a) db.scores.find({ score : { $gt : 50 , $lt : 60 } } );
+b) db.scores.find({ score : { $gte : 50 , $lte : 60 } } );
+c) db.scores.find({ score : { $gt : 50 , $lte : 60 } } );
+d) db.scores.find({ score : { $gte : 50 , $lt : 60 } } );
+e) db.scores.find({ score : { $gt : 50 } } );
+&nbsp;</pre>
+
+<hr>
+<br>
+<br>
+<hr>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>¿Qué hace esta consulta: <em>db.scores.find( { score : { $gt : 50 }, score : { $lt : 60 } } );</em> ?<br>
+<br>
+a) Encuentra todos los documentos con 'scoreo entre 50 and 60<br>
+b) Provoca el pánico el servidor, que huye despavorido<br>
+c) Encuentra todos los documentos con 'score' superior a 50<br>
+d) Encuentra todos los documentos con 'score' menor que 60<br>
+<br>
+<hr>
+<br>
+<br>
+<br>
+<h3 id="toc11"><a name="find en detalle-Operadores-$or, $and"></a><span style="padding-left: 30px;">$or, $and</span></h3>
+ <span style="padding-left: 30px;">Permiten hacer la disyunción/conjunción de varias consultas. Se usan de forma prefija seguidos por un array de documentos (consultas).</span><br>
+<ul><ul><li><span style="padding-left: 30px;">Buscar coordenadas que tengan o bien 4&lt;x&lt;6 o 10&lt;x&lt;12</span><br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">coord</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>$or<span class="sy0">:</span><span class="br0">[</span><span class="br0">{</span>x<span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">4</span><span class="sy0">,</span> $lt<span class="sy0">:</span><span class="nu0">6</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>x<span class="sy0">:</span><span class="br0">{</span>$gt<span class="sy0">:</span><span class="nu0">10</span><span class="sy0">,</span> $lt<span class="sy0">:</span><span class="nu0">12</span><span class="br0">}</span><span class="br0">}</span><span class="br0">]</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">5</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">2.5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">5.5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">5</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">2.5</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"x"</span> <span class="sy0">:</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="st0">"y"</span> <span class="sy0">:</span> <span class="nu0">5.5</span> <span class="br0">}</span></pre>
+
+</li></ul></ul><h1 id="toc12"> </h1>
+ <h3 id="toc13"><a name="find en detalle-Operadores-$exists"></a><span style="padding-left: 30px;">$exists</span></h3>
+ <br>
+El operador $exists es muy útil para comprobar si una clave existe en un documento.<br>
+<ul><ul><li>Por ejemplo, supongamos que queremos un listado de los clientes del banco que no tienen "cuentas":<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>cuentas<span class="sy0">:</span><span class="br0">{</span>$exists<span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span><span class="st0">"nombre"</span><span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span></pre>
+
+</li></ul></ul><h3 id="toc14"> </h3>
+ <br>
+<h3 id="toc15"><a name="find en detalle-Operadores-$type"></a>$type</h3>
+ Útil para buscar elementos con un cierto tipo. Los tipos son codificados numéricamente siguiendo la definición de BSON.<br>
+<ul><ul><li>Ejemplo: Buscar clientes cuyo nombre es de tipo string (codificado por 2)<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="br0">{</span>$type<span class="sy0">:</span><span class="nu0">2</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span><span class="st0">"nombre"</span><span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"toribia"</span> <span class="br0">}</span></pre>
+
+</li></ul></ul><h3 id="toc16"><a name="find en detalle-Operadores-$regex"></a>$regex</h3>
+ Permite definir expresiones regulares sobre strings.<br>
+<ul><ul><li>Ejemplo: Clientes que tienen una "e" en su nombre.<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="br0">{</span>$regex<span class="sy0">:</span><span class="st0">"e"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span><span class="st0">"nombre"</span><span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span> <span class="br0">}</span></pre>
+
+
+
+
+</li></ul></ul><br>
+
+La forma general es:
+<pre>{ <field>: { $regex: /pattern/, $options: '<options>' } }
+{ <field>: { $regex: 'pattern', $options: '<options>' } }
+{ <field>: { $regex: /pattern/<options> } }
+</options></field></options></field></options></field></pre>
+
+La parte $options es opcional e incluye una cadena que puede contener
+los caracteres i,m,x,s :
+<ul>
+<li><b>i</b>: No distingue mayúsculas o minúsculas</li>
+<li><b>m</b>: Para patrones con ^ o $, asume cadenas multilínea y devuelve un resultado por cada línea</li>
+<li><b>x</b>: Ignora espacios en blanco en el patrón a no ser que vengan "escapados" por \ </li>
+<li><b>s</b>: En el patrón el caracter especial '.' encaja con cualquier carácter, incluyendo el fin de línea</li>
+</ul>
+
+Vamos a ver ejemplos sobre la siguiente colección:
+<pre>&gt; db.textos.find({},{_id:0})
+{ "texto" : "Sé\nque\nfui\ny\ndi\nfe\nde\nmi.\nNo\nsé\nhoy\nlo\nque\nsoy" }
+{ "texto" : "Bertoldo" }
+{ "texto" : "Toldo" }
+{ "texto" : "Berto" }
+{ "texto" : "Herminia" }
+{ "texto" : "Calixta" }
+{ "texto" : "Melibeo" }
+{ "texto" : "BERTA" }
+</pre>
+
+Si no se indica otra cosa, $regex busca textos que empiecen con el prefijo
+
+<pre>db.textos.find({texto:{$regex:"Bert"}})
+</pre>
+
+<pre>db.textos.find({texto:{$regex:"Bert", $options:"i"}})
+</pre>
+
+Si se quiere usar explícitamente un prefijo usar ^. Si se quiere indicar un sufijo, utilizar $:
+
+<pre>db.textos.find({texto:{$regex:"to$"}})
+</pre>
+
+¿Cuál es la diferencia entre?
+<pre>db.textos.find( { texto: { $regex: /^y/} } )
+</pre>
+y
+<pre>db.textos.find( { texto: { $regex: /^y/, $options: 'm' } } )
+</pre>
+
+La secuencia . indica un carácter y .* representa una cantidad cualquiera de caracteres
+
+<pre>db.textos.find( { texto: { $regex: ".ert..." } } )
+</pre>
+db.textos.find( { texto: { $regex: ".ert.*" } } )
+
+
+con ? se puede activar una opción y ?- desactivar
+<pre>db.textos.find( { texto: { $regex: "(?i)B(?-i)ert" } } )
+</pre> 
+
+<h3 id="toc17"><a name="find en detalle-Operadores-$where"></a>$where</h3>
+ Este operador solo se puede usar en consola. Permite establecer una condición que deben cumplir todos documentos. El formato es $where:cadena, donde cadena es un string con una expresión JavaScript. El documento actual se referencia como this, y los valroes asociados a sus claves como this.clave.<br>
+<br>
+Por ejemplo en la colección de coordenada, devolver todas las que cumplan "x&gt;y":<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">coord</span>.<span class="me1">find</span><span class="br0">(</span> <span class="br0">{</span> $where <span class="sy0">:</span> <span class="st0">"this.x &gt; this.y"</span> <span class="br0">}</span> <span class="br0">)</span><span class="sy0">;</span></pre>
+
+<br>
+Para referirnos a los valores de la clave c en el documento actual usamos this.c.<br>
+Siempre que se puede se debe evitar usarlo porque es muy lento (se ejecute documento a documento, no usa índices)<br>
+<br>
+<br>
+<br>
+<h2 id="toc18"><a name="$expr"></a>$expr</h2>
+
+Expresiones que permiten combinar varias columnas, interesante y potente
+<pre>db.coord.find( { $expr: { $gt: [ "$x" , "$y" ] } } )
+</pre>
+Otro ejemplo:
+<pre>db.productos.find( {
+    $expr: {
+       $lt:[ {
+          $cond: {
+             if: { $gte: ["$cantidad", 100] },
+             then: { $divide: ["$price", 2] },
+             else: { $divide: ["$price", 4] }
+           }
+       },
+       5 ] }
+} )
+</pre>
+<br>
+<br>
+<br>
+
+<h2 id="toc18"><a name="find en detalle-arrays"></a>arrays</h2>
+ <br>
+<br>
+<h3 id="toc19"><a name="find en detalle-arrays-$all, $in, $nin, $elemMatch, $not"></a>$all, $in, $nin, $elemMatch, $not</h3>
+ <br>
+En este apartado vamos a crear una colección nueva incluyendo los siguientes documentos:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">gustos</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Bertoldo"</span><span class="sy0">,</span> comida<span class="sy0">:</span><span class="br0">[</span><span class="st0">"lentejas"</span><span class="sy0">,</span><span class="st0">"fabada"</span><span class="sy0">,</span><span class="st0">"cocido"</span> <span class="br0">]</span><span class="sy0">,</span> aficiones<span class="sy0">:</span><span class="br0">[</span><span class="st0">"siesta"</span><span class="sy0">,</span><span class="st0">"cine"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span>
+&nbsp;
+db.<span class="me1">gustos</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Herminia"</span><span class="sy0">,</span> comida<span class="sy0">:</span><span class="br0">[</span><span class="st0">"ensalada"</span><span class="sy0">,</span> <span class="st0">"pizza"</span><span class="sy0">,</span><span class="st0">"cocido"</span> <span class="br0">]</span><span class="sy0">,</span> aficiones<span class="sy0">:</span><span class="br0">[</span><span class="st0">"correr"</span><span class="sy0">,</span><span class="st0">"cine"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span>
+&nbsp;
+db.<span class="me1">gustos</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Aniceta"</span><span class="sy0">,</span> comida<span class="sy0">:</span><span class="br0">[</span><span class="st0">"salmón"</span><span class="sy0">,</span><span class="st0">"caviar"</span><span class="sy0">,</span><span class="st0">"champán"</span> <span class="br0">]</span><span class="sy0">,</span> aficiones<span class="sy0">:</span><span class="br0">[</span><span class="st0">"viajar"</span><span class="sy0">,</span><span class="st0">"cine"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span>
+&nbsp;
+db.<span class="me1">gustos</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Godofredo"</span><span class="sy0">,</span> comida<span class="sy0">:</span><span class="st0">"ensalada"</span><span class="sy0">,</span> aficiones<span class="sy0">:</span><span class="br0">[</span><span class="st0">"correr"</span><span class="sy0">,</span><span class="st0">"montaña"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+Para consultar si un elemento está en un array, en el shell basta con indicar el elemento como valor asociado a la clave (el nombre del array).<br>
+<br>
+Ejemplo: Nombre de personas a las que les gusta correr:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">gustos</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>aficiones<span class="sy0">:</span><span class="st0">"correr"</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Godofredo"</span> <span class="br0">}</span></pre>
+
+<br>
+Esto nos hace ver que la expresión 'clave:valor' está sobrecargada;<br>
+<ol><li>Busca elementos del documento con la forma 'clave:valor'</li><li>Busca elementos del documento con la forma 'clave:[....,valor,....]'</li></ol><br>
+Ejemplo: Nombre de las personas a las que les gusta la ensalada<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">gustos</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>comida<span class="sy0">:</span><span class="st0">"ensalada"</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Godofredo"</span> <span class="br0">}</span></pre>
+
+<br>
+Además se pueden usar varios operadores específicos:<br>
+<br>
+<h3 id="toc20"><a name="find en detalle-arrays-$all"></a>$all</h3>
+ Supongamos que queremos que queremos saber si alguien le gusta las ensalada y el cocido. Sería un error escribir:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">db.gustos.find({comida:["ensalada","cocido"]})</pre>
+
+<br>
+porque estaríamos pidiendo que solo le gusten las dos cosas. Para pedir que un array contenga al menos los elementos que indicamos se usa el operador $all<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">gustos</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>comida<span class="sy0">:</span><span class="br0">{</span>$all<span class="sy0">:</span><span class="br0">[</span><span class="st0">"lentejas"</span><span class="sy0">,</span><span class="st0">"cocido"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span> <span class="br0">}</span></pre>
+
+<br>
+<br>
+<h3 id="toc21"><a name="find en detalle-arrays-$in"></a>$in</h3>
+ <br>
+Podemos preguntar a qué personas les gusta el champán o la ensalada (o las dos cosas) con el operador<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">gustos</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>comida<span class="sy0">:</span><span class="br0">{</span>$in<span class="sy0">:</span><span class="br0">[</span><span class="st0">"champán"</span><span class="sy0">,</span><span class="st0">"ensalada"</span><span class="br0">]</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span><span class="st0">"_id"</span><span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceta"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Godofredo"</span> <span class="br0">}</span></pre>
+
+<br>
+<h3 id="toc22"><a name="find en detalle-arrays-$nin"></a>$nin</h3>
+ <br>
+Asegura que la clave (de tipo array) no incluye ninguno de los valores.<br>
+<br>
+Ejemplo: Nombre de las personas a las que no les gusta correr ni viajar:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">db.gustos.find({aficiones:{'$nin':["correr","viajar"]}},{nombre:true,"_id":false})</pre>
+
+<br>
+<br>
+<h3 id="toc23"><a name="find en detalle-arrays-Posiciones"></a>Posiciones</h3>
+ <br>
+También se puede preguntar por el valor de una <em>posición</em> determinada del array.<br>
+<br>
+Por ejemplo, suponiendo que el orden en la lista de aficiones es relevante (la primera es la preferida), queremos saber el nombre de las personas cuya afición preferida es correr:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">gustos</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span><span class="st0">"aficiones.0"</span><span class="sy0">:</span><span class="st0">"correr"</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span> _id<span class="sy0">:</span><span class="nu0">0</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Godofredo"</span> <span class="br0">}</span>
+&nbsp;</pre>
+
+<br>
+<h3 id="toc24"><a name="find en detalle-arrays-$elemMatch"></a>$elemMatch</h3>
+ En ocasiones interesa saber si algún elemento del array en el documento verifica una condición compleja<br>
+<br>
+Por ejemplo, supongamos que tenemos estos documentos<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">{ _id: 1, results: [ 82, 85, 88 ] }
+{ _id: 2, results: [ 75, 88, 89 ] }</pre>
+
+<br>
+Queremos obtener los documentos que tengan algún valor entre 84 y 86:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">db.scores.find(
+   { results: { $elemMatch: { $gte: 80, $lt: 85 } } }
+)</pre>
+
+
+<br>
+
+<h3 id="toc24"><a name="find en detalle-arrays-proyecciones"></a>Proyecciones</h3>
+La parte proyect de los arrays permite usar 3 operadores para mostrar solo parte de las claves de tipo array. Estos operadores se usan en el segundo parámetro de find (proyección).
+
+<h4>1.-  $slice
+</h4>
+
+Muestra partes de un array. Tiene dos formas
+
+<pre>clave:{$slice:n}  
+</pre>
+
+muestra las n primeras componentes del array. Si n es negativo muestra las n últimas.
+
+Mostrar solo la última afición de cada persona.
+<pre>  db.gustos.find({},{_id:0,nombre:1,aficiones:{$slice:-1}})
+ </pre> 
+
+La segunda posibilidad tiene la forma:
+<pre>clave:{$slice:[n1,n2]}  
+</pre>
+
+n1 es la cantidad de valores que se "saltan", y n2 la cantidad de valores consecutivos a mostrar.
+<br>
+Por ejemplo,
+Solo la segunda aficion de cada persona:
+
+<pre>  db.gustos.find({},{_id:0,nombre:1,aficiones:{$slice:[1,1]}})
+</pre>
+
+En este caso el primer valor del array es la pos. inicial, y el segundo la cantidad de elementos a considerar.
+
+<h4>
+  $
+</h4>
+Permite que se muestre solo el elemento del array que satisface la consulta.
+
+Ejemplo: mostrar los nombres de personas que tienen aficiones que comienzan
+con "c":
+<pre>  db.gustos.find({aficiones:/c/},{nombre:1,aficiones:1,_id:0})
+  </pre>
+
+Lo malo es que nos salen todas las aficiones:
+
+<pre>  db.gustos.find({aficiones:/c/},{nombre:1,"aficiones.$":1,_id:0})
+</pre>
+  
+<h4>  $elemMatch</h4>
+
+Solo los elementos que cumplan una condición compleja.
+
+<pre>  db.schools.find( { zipcode: "63109" },
+                 { students: { $elemMatch: { school: 102, age: { $gt: 10} } } } )
+  </pre>
+
+<br>
+<h2 id="toc25"><a name="find en detalle-Subcomponentes"></a>Subcomponentes</h2>
+ Para buscar valores dentro de un array o dentro de un subdocumento se usa la notación ".". Para ello volvemos a la tabla de cuentas.<br>
+<br>
+Ejemplo: nombres de las personas que tienen un saldo menor de 300 euros en alguna de sus cuentas.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span><span class="st0">"cuentas.saldo"</span><span class="sy0">:</span><span class="br0">{</span>$lt <span class="sy0">:</span> <span class="nu0">400</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span> _id<span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"toribia"</span> <span class="br0">}</span></pre>
+
+La notación "." también puede utilizarse para referirse a una posición de un array (con 0 la primera posición).<br>
+<br>
+<br>
+Ejemplo: nombres de las personas que tienen un saldo mayor a 1000 euros en la primera de sus cuentas.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span><span class="st0">"cuentas.0.saldo"</span><span class="sy0">:</span><span class="br0">{</span>$gt <span class="sy0">:</span><span class="nu0">1000</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span> _id<span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span> <span class="br0">}</span></pre>
+
+<br>
+<br>
+<h1 id="toc26"><a name="Variables"></a>Variables</h1>
+ <br>
+Las variables en el shell se usan para apuntar valores que se van a usar posteriormente<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> x<span class="sy0">=</span><span class="nu0">1</span>
+<span class="nu0">1</span>
+<span class="sy0">&gt;</span> x
+<span class="nu0">1</span>
+<span class="sy0">&gt;</span> x<span class="sy0">+</span><span class="nu0">1</span>
+<span class="nu0">2</span>
+<span class="sy0">&gt;</span> x<span class="sy0">=</span>x<span class="sy0">+</span><span class="nu0">1</span>
+<span class="nu0">2</span></pre>
+
+Se pueden usar también para contener documentos:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> q <span class="sy0">=</span> <span class="br0">{</span><span class="kw3">name</span><span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span>cuisine<span class="sy0">:</span><span class="nu0">1</span><span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"name"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"cuisine"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span> db.<span class="me1">restaurants</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span>q<span class="br0">)</span>.<span class="me1">limit</span><span class="br0">(</span><span class="nu0">3</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"568efd14837f2b15194d92e0"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"cuisine"</span> <span class="sy0">:</span> <span class="st0">"Bakery"</span><span class="sy0">,</span> <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"Morris Park Bake Shop"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"568efd15837f2b15194d92e1"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"cuisine"</span> <span class="sy0">:</span> <span class="st0">"Hamburgers"</span><span class="sy0">,</span> <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"Wendy'S"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"568efd15837f2b15194d92e2"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"cuisine"</span> <span class="sy0">:</span> <span class="st0">"Irish"</span><span class="sy0">,</span> <span class="st0">"name"</span> <span class="sy0">:</span> <span class="st0">"Dj Reynolds Pub And Restaurant"</span> <span class="br0">}</span></pre>
+
+<br>
+Recordar que tanto find como findOne aceptan dos parámetros, una consulta y una proyección.
+<br>
+<h1 id="toc27"><a name="otras"></a>Otras consultas: distinct, count</h1>
+ <br>
+ <i>distinct</i> devuelve el número de valores distintos de una clave (entre comillas) o
+ de una query.
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">coord</span>.<span class="me1">distinct</span><span class="br0">(</span>"x"<span class="sy0"><span class="br0">)</span>
+</span></pre>
+ 
+ <i>count</i> cuenta el número de documentos devuelto por una query.
+
+<h1 id="toc27"><a name="Update"></a>Update</h1>
+ <br>
+En general las modificaciones se hacen mediante:<br>
+<tt>db.collection.</tt><tt>update</tt><span style="font-size: 120%;">(</span><em>query</em>, <em>update</em>, <em>options</em><span style="font-size: 120%;">)</span><br>
+<br>
+<ul><li><em>query</em> selecciona los elementos que se van a actualizar.</li><li><em>update</em> indica los cambios que se van a hacer</li><li>options es una parte opcional. Aquí veremos las opciones upsert y multi.</li></ul><br>
+<h2 id="toc28"><a name="Update-Update total"></a>Update total</h2>
+ Una primera forma fácil de hacer update es simplemente reemplazar un documento por otro; es decir un <em>update total</em>.<br>
+En este tipo de update el segundo parámetro es simplemente el valor que queremos poner en el documento (excepto el _id que será el dado por el primer parámetro query).<br>
+<br>
+Por ejemplo, supongamos una colección simple con estos campos:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">estelar</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="nu0">1</span><span class="sy0">,</span> nombre<span class="sy0">:</span><span class="st0">"Sirio"</span><span class="sy0">,</span> tipo<span class="sy0">:</span><span class="st0">"estrella"</span><span class="sy0">,</span> espectro<span class="sy0">:</span><span class="st0">"A1V"</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">estelar</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="nu0">2</span><span class="sy0">,</span> nombre<span class="sy0">:</span><span class="st0">"saturno"</span><span class="sy0">,</span> tipo<span class="sy0">:</span><span class="st0">"planeta"</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">estelar</span>.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="nu0">3</span><span class="sy0">,</span> nombre<span class="sy0">:</span><span class="st0">"Plutón"</span><span class="sy0">,</span> tipo<span class="sy0">:</span><span class="st0">"planeta"</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+Ahora queremos cambiar el tipo de Plutón por el de "planeta enano". Supongamos que probamos a hacer:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">estelar</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="nu0">3</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>tipo<span class="sy0">:</span><span class="st0">"planeta enano"</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+Vemos cómo ha quedado la colección:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"> db.<span class="me1">estelar</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Sirio"</span><span class="sy0">,</span> <span class="st0">"tipo"</span> <span class="sy0">:</span> <span class="st0">"estrella"</span><span class="sy0">,</span> <span class="st0">"espectro"</span> <span class="sy0">:</span> <span class="st0">"A1V"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"saturno"</span><span class="sy0">,</span> <span class="st0">"tipo"</span> <span class="sy0">:</span> <span class="st0">"planeta"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="st0">"tipo"</span> <span class="sy0">:</span> <span class="st0">"planeta enano"</span> <span class="br0">}</span>
+&nbsp;</pre>
+
+<br>
+<br>
+<hr>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>¿Qué ha salido mal?<br>
+<hr>
+<br>
+<br>
+Ahora lo hacemos correctamente<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">estelar</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span>_id<span class="sy0">:</span><span class="nu0">3</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Plutón"</span><span class="sy0">,</span> tipo<span class="sy0">:</span><span class="st0">"planeta enano"</span>  <span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+<br>
+Vemos cómo ha quedado la colección:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"> db.<span class="me1">estelar</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Sirio"</span><span class="sy0">,</span> <span class="st0">"tipo"</span> <span class="sy0">:</span> <span class="st0">"estrella"</span><span class="sy0">,</span> <span class="st0">"espectro"</span> <span class="sy0">:</span> <span class="st0">"A1V"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"saturno"</span><span class="sy0">,</span> <span class="st0">"tipo"</span> <span class="sy0">:</span> <span class="st0">"planeta"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Plutón"</span><span class="sy0">,</span> <span class="st0">"tipo"</span> <span class="sy0">:</span> <span class="st0">"planeta enano"</span> <span class="br0">}</span></pre>
+
+<br>
+<br>
+<hr>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>¿Qué código escribiríamos para cambiar el nombre de "saturno" a "Saturno", suponiendo que no sabemos el _id?<br>
+<hr>
+<br>
+<br>
+<h2 id="toc29"><a name="Update-Update parcial"></a>Update parcial</h2>
+ <br>
+Los update totales nos obligan a repetir toda la información del documento. Esto no es en general práctico porque en Mongo los documentos tienden a ser complicados (en ocasiones sí es útil, sobre todo en un lenguaje de programación, donde se consulta, modifica y escribe el documento). Siempre que se pueda es recomendable usar update parciales. En éstos el segundo parámetro indica con algún operador como $set los cambios que se quieren hacer sobre el documento recuperado por la query.<br>
+<br>
+Por ejemplo, supongamos que queremos cambiar el nombre "aniceto" a "Aniceto"<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"aniceto"</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$set <span class="sy0">:</span> <span class="br0">{</span> nombre<span class="sy0">:</span> <span class="st0">"Aniceto"</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<hr>
+<img src="./MongoDB - CRUD_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: Recordar que si no se pone el "$set" el segundo documento completo sustituye al primero (en el ejemplo el documento quedaría {nombre:"Aniceto"} perdiéndose el resto de la información. ¡Peligroso!<br>
+<hr>
+Si la clave en $set no existe se añade, lo que hace de update una herramienta útil para insertar nueva información.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Aniceto"</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$set <span class="sy0">:</span> <span class="br0">{</span>edad<span class="sy0">:</span> <span class="nu0">21</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+&nbsp;
+ db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Aniceto"</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"56916278790da32770e26afb"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span><span class="sy0">,</span>
+   <span class="st0">"calle"</span> <span class="sy0">:</span> <span class="st0">"Calle, calle"</span><span class="sy0">,</span> <span class="st0">"cuentas"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="br0">{</span> <span class="st0">"num"</span> <span class="sy0">:</span> <span class="st0">"003"</span><span class="sy0">,</span> <span class="st0">"saldo"</span> <span class="sy0">:</span> <span class="nu0">1500</span><span class="sy0">,</span>
+    <span class="st0">"compartida"</span> <span class="sy0">:</span> <span class="kw2">false</span> <span class="br0">}</span> <span class="br0">]</span><span class="sy0">,</span> <span class="st0">"hipoteca"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"total"</span> <span class="sy0">:</span> <span class="nu0">250000</span><span class="sy0">,</span> <span class="st0">"debe"</span> <span class="sy0">:</span> <span class="nu0">0</span> <span class="br0">}</span><span class="sy0">,</span> <span class="st0">"edad"</span> <span class="sy0">:</span> <span class="nu0">21</span> <span class="br0">}</span>
+&nbsp;</pre>
+
+<br>
+Si no hay nadie con nombre "Aniceto" entonces la instrucción no hará nada. Sin embargo, en ocasiones queremos que en caso de que esté lo modifique, y sino está que lo añada. Esta mezcla de "insert" y "update" es conocida como "upsert" y se añader como una opción para update. Las opciones se ponen como tercer parámetro:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Aniceto"</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$set <span class="sy0">:</span> <span class="br0">{</span>edad<span class="sy0">:</span> <span class="nu0">21</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>upsert<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+Tras esta instrucción estamos seguro de que hay un documento para "Aniceto" con edad 21.<br>
+<br>
+<hr>
+<strong><img src="./MongoDB - CRUD_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>$set es solo uno de los muchos operadores que se pueden usar en el segundo argumento. Hay otros muy interesantes como $unset para eliminar una clave, o $inc para incrementar el valor de un campo en una cantidad dada. La lista completa se puede encontrar en:<br>
+<a class="wiki_link_ext" href="https://docs.mongodb.org/v3.4/reference/operator/update-field/" rel="nofollow">https://docs.mongodb.org/v3.4/reference/operator/update-field/</a><br>
+<hr>
+<br>
+Ejemplo: Eliminar el campo edad de Aniceto.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"Aniceto"</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$unset <span class="sy0">:</span> <span class="br0">{</span>edad<span class="sy0">:</span> <span class="kw2">true</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+<br>
+<hr>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>¿Tendría sentido utilizar upsert cuando estamos haciendo $unset?<br>
+<hr>
+<br>
+Otra forma de modificar desde el shell es utilizar una variable para almacenar el resultado:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">x <span class="sy0">=</span> db.<span class="me1">cuentas</span>.<span class="me1">findOne</span><span class="br0">(</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"bertoldo"</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span><span class="br0">}</span><span class="br0">)</span>
+x.<span class="me1">nombre</span><span class="sy0">=</span><span class="st0">"Bertoldo"</span>
+db.<span class="me1">cuentas</span>.<span class="me1">save</span><span class="br0">(</span>x<span class="br0">)</span></pre>
+
+Ahora el nombre del primer registro ha sido cambiado a Bertodo con B mayúscula.<br>
+Nota: no olvidar llamar a save() al final<br>
+<br>
+Finalmente, una última posibilidad es usar save con la misma sintaxis que insert<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">save</span><span class="br0">(</span><span class="br0">{</span><span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"5691626a790da32770e26afa"</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+En este caso debemos añadir un dato que permita identificar el documento, normalmente el identificador.<br>
+<br>
+<hr>
+<br>
+<img src="./MongoDB - CRUD_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: En el caso de grandes documentos usar un update parcial puede ahorrar mucho tiempo, ya que reduce la cantidad de información que tiene que viajar hasta el servidor<br>
+<hr>
+<br>
+<br>
+Entre los operadores usados en los update parciales, merece la pena destacar los que se dedican al manejo de arrays.<br>
+<br>
+<h2 id="toc30"><a name="Update-Arrays"></a>Arrays</h2>
+ <br>
+Dentro de la modificación de valores los arrays tienen un tratamiento especial. Para ellos se han definido una serie de operadores que pueden sernos muy útiles.<br>
+Antes de empezar vamos a crear una colección "enteros" con solo un documento:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">db.enteros.insert({a:[10,11,12,13,14,15]})</pre>
+
+Ahora podemos explicar las diferentes operaciones.<br>
+<br>
+<ul><li>$set, $inc,...: se puede aplicar a posiciones particulares de un array (esto es válido para arrays de cualquier tipo).<br>
+Por ejemplo para incrementar la primera posición del array (0) en dos unidades:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$inc <span class="sy0">:</span> <span class="br0">{</span><span class="st0">"a.0"</span><span class="sy0">:</span><span class="nu0">2</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> WriteResult<span class="br0">(</span><span class="br0">{</span> <span class="st0">"nMatched"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"nUpserted"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"nModified"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> <span class="sy0">&gt;</span> db.<span class="me1">enteros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"..."</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">13</span><span class="sy0">,</span> <span class="nu0">14</span><span class="sy0">,</span> <span class="nu0">15</span> <span class="br0">]</span> <span class="br0">}</span>
+<span class="sy0">&gt;</span>
+<span class="sy0">&gt;</span></pre>
+
+</li><li>$push: Añade un elemento al final del array, y si el array no existe, lo crea.<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$push <span class="sy0">:</span> <span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">3.1415</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+WriteResult<span class="br0">(</span><span class="br0">{</span> <span class="st0">"nMatched"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"nUpserted"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"nModified"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> db.<span class="me1">enteros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"..."</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">13</span><span class="sy0">,</span> <span class="nu0">14</span><span class="sy0">,</span> <span class="nu0">15</span><span class="sy0">,</span> <span class="nu0">3.1415</span> <span class="br0">]</span> <span class="br0">}</span></pre>
+
+</li></ul>En lugar de añadir al principio, se puede decir la información y añadir variaos a la vez:<br>
+<br>
+Ejemplo: meter los valoes 50,60 y 70 al principio del array scores (position:0), para el documento de _id:1:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">students</span>.<span class="me1">update</span><span class="br0">(</span>
+   <span class="br0">{</span> _id<span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span><span class="sy0">,</span>
+   <span class="br0">{</span>
+     $push<span class="sy0">:</span> <span class="br0">{</span>
+        scores<span class="sy0">:</span> <span class="br0">{</span>
+           $each<span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">50</span><span class="sy0">,</span> <span class="nu0">60</span><span class="sy0">,</span> <span class="nu0">70</span> <span class="br0">]</span><span class="sy0">,</span>
+           $position<span class="sy0">:</span> <span class="nu0">0</span>
+        <span class="br0">}</span>
+     <span class="br0">}</span>
+   <span class="br0">}</span>
+<span class="br0">)</span></pre>
+
+<br>
+<br>
+<br>
+$pushAll es análogo pero añadiendo una lista de valores<br>
+<br>
+<ul><li>$pop: elimina el último elemento<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$pop <span class="sy0">:</span> <span class="br0">{</span>a<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+WriteResult<span class="br0">(</span><span class="br0">{</span> <span class="st0">"nMatched"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"nUpserted"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"nModified"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> db.<span class="me1">enteros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"..."</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">13</span><span class="sy0">,</span> <span class="nu0">14</span><span class="sy0">,</span> <span class="nu0">15</span> <span class="br0">]</span> <span class="br0">}</span></pre>
+
+</li></ul><br>
+<ul class="quotelist"><li>El valor que se pone tras el nombre del array (true en el ejemplo) es indiferente excepto que se ponga un número negativo. Entonces se eliminará el primer elemento:</li></ul><br>
+<ul class="quotelist"><li>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$pop <span class="sy0">:</span> <span class="br0">{</span>a<span class="sy0">:-</span><span class="nu0">666</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> WriteResult<span class="br0">(</span><span class="br0">{</span> <span class="st0">"nMatched"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span> <span class="st0">"nUpserted"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st0">"nModified"</span> <span class="sy0">:</span> <span class="nu0">1</span> <span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> <span class="sy0">&gt;</span> db.<span class="me1">enteros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> <span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"..."</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">13</span><span class="sy0">,</span> <span class="nu0">14</span><span class="sy0">,</span> <span class="nu0">15</span> <span class="br0">]</span> <span class="br0">}</span></pre>
+
+</li></ul><br>
+<ul><li>$pull:elimina todas las copias de un elemento del array:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$pushAll <span class="sy0">:</span> <span class="br0">{</span>a<span class="sy0">:</span><span class="br0">[</span><span class="nu0">11</span><span class="sy0">,</span><span class="nu0">3</span><span class="sy0">,</span><span class="nu0">3</span><span class="sy0">,</span><span class="nu0">3</span><span class="sy0">,</span><span class="nu0">4</span><span class="sy0">,</span><span class="nu0">5</span><span class="br0">]</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">enteros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"..."</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">13</span><span class="sy0">,</span> <span class="nu0">14</span><span class="sy0">,</span> <span class="nu0">15</span><span class="sy0">,</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="nu0">4</span><span class="sy0">,</span> <span class="nu0">5</span> <span class="br0">]</span> <span class="br0">}</span>
+db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$pull<span class="sy0">:</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">4</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">enteros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"..."</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">13</span><span class="sy0">,</span> <span class="nu0">14</span><span class="sy0">,</span> <span class="nu0">15</span><span class="sy0">,</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="nu0">3</span><span class="sy0">,</span> <span class="nu0">5</span> <span class="br0">]</span> <span class="br0">}</span>
+db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$pull<span class="sy0">:</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">3</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">enteros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"..."</span><span class="br0">)</span><span class="sy0">,</span> <span class="st0">"a"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">13</span><span class="sy0">,</span> <span class="nu0">14</span><span class="sy0">,</span> <span class="nu0">15</span><span class="sy0">,</span> <span class="nu0">11</span><span class="sy0">,</span> <span class="nu0">5</span> <span class="br0">]</span> <span class="br0">}</span></pre>
+
+</li></ul><br>
+<ul><li>$pullAll: Análogo pero para un array de valores</li></ul><br>
+<ul><li>$addToSet: Añade el elmento considerando el array como si fuera un conjunto, es decir, si el elemento ya existe no lo añade</li></ul><br>
+<ul class="quotelist"><li>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$addToSet<span class="sy0">:</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">11</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$addToSet<span class="sy0">:</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">3</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$addToSet<span class="sy0">:</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">12</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">enteros</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>$addToSet<span class="sy0">:</span><span class="br0">{</span>a<span class="sy0">:</span><span class="nu0">3</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+</li></ul><br>
+<ul class="quotelist"><li><br>
+</li><li><strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>¿Qué tendra la coleeción enteros tras las últimas llamadas a $addToSet ?</li></ul><br>
+<h2 id="toc31"><a name="Update-Multiupdates"></a>Multiupdates</h2>
+ <br>
+¿Qué ocurre si al hacer update varios documentos satisfacen el criterio dado?<br>
+<br>
+Por ejemplo, supongamos que nuestra idea es añadir una clave "género", y que decidimos que los nombres que acaben en "o" corresponden a hombres (no es cierto, por ejemplo "Rocio"), y los que acaben en "a" con género "mujer" (tampoco es cierto). Para detectar el final de un string se puede usar la expresión regular que acaba en "$". Por ejemlo "o$" encaja con cualquier string que acabe en "o".<br>
+<br>
+Por tanto podemos ejecutar:<br>
+<br>
+<ul class="quotelist"><li>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="br0">{</span>$regex<span class="sy0">:</span><span class="st0">"a$"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$set <span class="sy0">:</span> <span class="br0">{</span>género<span class="sy0">:</span><span class="st0">"mujer"</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="br0">{</span>$regex<span class="sy0">:</span><span class="st0">"o$"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$set <span class="sy0">:</span> <span class="br0">{</span>género<span class="sy0">:</span><span class="st0">"hombre"</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">cuentas</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span><span class="br0">}</span><span class="sy0">,</span><span class="br0">{</span>nombre<span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span> género<span class="sy0">:</span><span class="kw2">true</span><span class="sy0">,</span> _id<span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span><span class="br0">)</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Bertoldo"</span><span class="sy0">,</span> <span class="st0">"género"</span> <span class="sy0">:</span> <span class="st0">"hombre"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Herminia"</span><span class="sy0">,</span> <span class="st0">"género"</span> <span class="sy0">:</span> <span class="st0">"mujer"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span> <span class="br0">}</span>
+<span class="br0">{</span> <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"toribia"</span> <span class="br0">}</span></pre>
+
+</li></ul>El resultado no es el que podríamos esperar: solo se ha modificado un documento en cada consulta. Este es el comportamiento por defecto de update. Si queremos que afecte a todos tenemos que añadir la opción "multi:true":<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="br0">{</span>$regex<span class="sy0">:</span><span class="st0">"a$"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$set <span class="sy0">:</span> <span class="br0">{</span>género<span class="sy0">:</span><span class="st0">"mujer"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>multi<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="br0">{</span>$regex<span class="sy0">:</span><span class="st0">"o$"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$set <span class="sy0">:</span> <span class="br0">{</span>género<span class="sy0">:</span><span class="st0">"hombre"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>multi<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+Ahora el resultado sí es el esperado:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="br0">{</span>$regex<span class="sy0">:</span><span class="st0">"a$"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$set <span class="sy0">:</span> <span class="br0">{</span>género<span class="sy0">:</span><span class="st0">"mujer"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>multi<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">cuentas</span>.<span class="me1">update</span><span class="br0">(</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="br0">{</span>$regex<span class="sy0">:</span><span class="st0">"o$"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>$set <span class="sy0">:</span> <span class="br0">{</span>género<span class="sy0">:</span><span class="st0">"hombre"</span><span class="br0">}</span><span class="br0">}</span><span class="sy0">,</span> <span class="br0">{</span>multi<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+<hr>
+<strong><img src="./MongoDB - CRUD_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>Esta es una diferencia importante con SQL, donde update modifica a todos los documentos por defecto.<br>
+<hr>
+<h1 id="toc32"> </h1>
+ <h1 id="toc33"><a name="Remove"></a>Remove</h1>
+ <br>
+Para borrar elementos de una colección se puede usar el método remove que recibe como parámetro una query y elimina todos los elementos de la colección que encajan con la consulta.<br>
+<br>
+<ul><li>db.telef.remove({}) : borra todos los elementos de la colección telef. Si se quiere hacer esto es mejor db.people.drop()</li><li>db.cuentas.remove({nombre:"Bertoldo"}): borra a Bertoldo de la colección</li></ul><h1 id="toc34"> </h1>
+ <h1 id="toc35"><a name="Bulk"></a>Bulk</h1>
+ <br>
+<ul><li>Realiza operacioens sobre muchos documentos a la vez.</li><li>Empleado por eficiencia</li><li>Lo veremos en Python con el nombre <em>insert_many, delete_may, update_many.</em></li><li>En realidad no es una operación CRUD básica sino una operación de "administración". Es uno de los llamados <strong>comandos</strong></li><li>Puede entenderse como un fichero 'batch' (un lote de operaciones)</li></ul><br>
+Admite dos variantes:<br>
+<br>
+<ul><li>Sin orden: Preferible, se pueden hacer en paralelo.</li><li>Ordenadas: Es importante el orden</li></ul><br>
+Tiene 3 fases:<br>
+<br>
+1.- <strong>Inicialización</strong><br>
+Un bulk no ordenado se inicializa así:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">var</span> bulk <span class="sy0">=</span> db.<span class="me1">cacharros</span>.<span class="me1">initializeUnorderedBulkOp</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+<br>
+Si está ordenado;<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">var</span> bulk <span class="sy0">=</span> db.<span class="me1">cacharros</span>.<span class="me1">initializeOrderedBulkOp</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+Esta inicialización todavía no envía nada al servidor.<br>
+<br>
+<br>
+2.- <strong>Añadir Operaciones</strong><br>
+Por ejemplo:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">bulk.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>cacharro<span class="sy0">:</span><span class="st0">"tv"</span><span class="sy0">,</span> pulgadas<span class="sy0">:</span><span class="nu0">40</span><span class="sy0">,</span> unidades<span class="sy0">:</span><span class="nu0">100</span><span class="sy0">,</span> precio<span class="sy0">:</span><span class="nu0">1000</span><span class="br0">}</span><span class="br0">)</span>
+bulk.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>cacharro<span class="sy0">:</span><span class="st0">"mp3"</span><span class="sy0">,</span> memoriaBg<span class="sy0">:</span><span class="nu0">32</span><span class="sy0">,</span> unidades<span class="sy0">:</span><span class="nu0">200</span><span class="sy0">,</span> precio<span class="sy0">:</span><span class="nu0">50</span><span class="br0">}</span><span class="br0">)</span>
+bulk.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>cacharro<span class="sy0">:</span><span class="st0">"impresora"</span><span class="sy0">,</span> tipo<span class="sy0">:</span><span class="st0">"laser"</span><span class="sy0">,</span> unidades<span class="sy0">:</span><span class="nu0">80</span><span class="sy0">,</span> precio<span class="sy0">:</span><span class="nu0">570</span><span class="br0">}</span><span class="br0">)</span>
+db.<span class="me1">cacharros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+Observamos que el find no muestra nada...todavía no se ha enviado nada al servidor.<br>
+<br>
+Aquí solo hemos hecho inserciones, pero se pueden mezclar diversas operaciones.<br>
+<br>
+<strong>3.- Ejecutar</strong><br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">bulk.<span class="me1">execute</span><span class="br0">(</span><span class="br0">)</span></pre>
+
+<br>
+Nos da un informe:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">BulkWriteResult<span class="br0">(</span><span class="br0">{</span>
+    <span class="st0">"writeErrors"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="br0">]</span><span class="sy0">,</span>
+    <span class="st0">"writeConcernErrors"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="br0">]</span><span class="sy0">,</span>
+    <span class="st0">"nInserted"</span> <span class="sy0">:</span> <span class="nu0">3</span><span class="sy0">,</span>
+    <span class="st0">"nUpserted"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+    <span class="st0">"nMatched"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+    <span class="st0">"nModified"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+    <span class="st0">"nRemoved"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+    <span class="st0">"upserted"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="br0">]</span>
+&nbsp;</pre>
+
+<br>
+Y ahora a sí ha llegado la información al servidor:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"> db.<span class="me1">cacharros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">count</span><span class="br0">(</span><span class="br0">)</span>
+<span class="nu0">3</span></pre>
+
+<br>
+<br>
+Vamos a ver otras operaciones, para ver su sintaxis<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">var</span> bulk <span class="sy0">=</span> db.<span class="me1">cacharros</span>.<span class="me1">initializeOrderedBulkOp</span><span class="br0">(</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> bulk.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>cacharro<span class="sy0">:</span><span class="st0">"tv"</span><span class="br0">}</span><span class="br0">)</span>.<span class="me1">remove</span><span class="br0">(</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> bulk.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>cacharro<span class="sy0">:</span><span class="st0">"tv"</span><span class="sy0">,</span> tipo<span class="sy0">:</span><span class="st0">"vintage b/n"</span><span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> bulk.<span class="me1">insert</span><span class="br0">(</span><span class="br0">{</span>cacharro<span class="sy0">:</span><span class="st0">"tv"</span><span class="sy0">,</span> pulgadas<span class="sy0">:</span><span class="nu0">50</span><span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> bulk.<span class="me1">find</span><span class="br0">(</span><span class="br0">{</span>cacharro<span class="sy0">:</span><span class="st0">"tv"</span><span class="br0">}</span><span class="br0">)</span>.<span class="me1">update</span><span class="br0">(</span><span class="br0">{</span>$set<span class="sy0">:</span><span class="br0">{</span>unidades<span class="sy0">:</span><span class="nu0">20</span><span class="br0">}</span><span class="br0">}</span><span class="br0">)</span>
+<span class="sy0">&gt;</span> bulk.<span class="me1">execute</span><span class="br0">(</span><span class="br0">)</span>
+BulkWriteResult<span class="br0">(</span><span class="br0">{</span>
+    <span class="st0">"writeErrors"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="br0">]</span><span class="sy0">,</span>
+    <span class="st0">"writeConcernErrors"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="br0">]</span><span class="sy0">,</span>
+    <span class="st0">"nInserted"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span>
+    <span class="st0">"nUpserted"</span> <span class="sy0">:</span> <span class="nu0">0</span><span class="sy0">,</span>
+    <span class="st0">"nMatched"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span>
+    <span class="st0">"nModified"</span> <span class="sy0">:</span> <span class="nu0">2</span><span class="sy0">,</span>
+    <span class="st0">"nRemoved"</span> <span class="sy0">:</span> <span class="nu0">1</span><span class="sy0">,</span>
+    <span class="st0">"upserted"</span> <span class="sy0">:</span> <span class="br0">[</span> <span class="br0">]</span>
+<span class="br0">}</span><span class="br0">)</span></pre>
+
+<br>
+La colección ahora:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> db.<span class="me1">cacharros</span>.<span class="me1">find</span><span class="br0">(</span><span class="br0">)</span>.<span class="me1">pretty</span><span class="br0">(</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"569b9449f302a391e3d9ed71"</span><span class="br0">)</span><span class="sy0">,</span>
+    <span class="st0">"cacharro"</span> <span class="sy0">:</span> <span class="st0">"mp3"</span><span class="sy0">,</span>
+    <span class="st0">"memoriaBg"</span> <span class="sy0">:</span> <span class="nu0">32</span><span class="sy0">,</span>
+    <span class="st0">"unidades"</span> <span class="sy0">:</span> <span class="nu0">200</span><span class="sy0">,</span>
+    <span class="st0">"precio"</span> <span class="sy0">:</span> <span class="nu0">50</span>
+<span class="br0">}</span>
+<span class="br0">{</span>
+    <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"569b9449f302a391e3d9ed72"</span><span class="br0">)</span><span class="sy0">,</span>
+    <span class="st0">"cacharro"</span> <span class="sy0">:</span> <span class="st0">"impresora"</span><span class="sy0">,</span>
+    <span class="st0">"tipo"</span> <span class="sy0">:</span> <span class="st0">"laser"</span><span class="sy0">,</span>
+    <span class="st0">"unidades"</span> <span class="sy0">:</span> <span class="nu0">80</span><span class="sy0">,</span>
+    <span class="st0">"precio"</span> <span class="sy0">:</span> <span class="nu0">570</span>
+<span class="br0">}</span>
+<span class="br0">{</span>
+    <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"569b95e9f302a391e3d9ed73"</span><span class="br0">)</span><span class="sy0">,</span>
+    <span class="st0">"cacharro"</span> <span class="sy0">:</span> <span class="st0">"tv"</span><span class="sy0">,</span>
+    <span class="st0">"tipo"</span> <span class="sy0">:</span> <span class="st0">"vintage b/n"</span><span class="sy0">,</span>
+    <span class="st0">"unidades"</span> <span class="sy0">:</span> <span class="nu0">20</span>
+<span class="br0">}</span>
+<span class="br0">{</span>
+    <span class="st0">"_id"</span> <span class="sy0">:</span> ObjectId<span class="br0">(</span><span class="st0">"569b95e9f302a391e3d9ed74"</span><span class="br0">)</span><span class="sy0">,</span>
+    <span class="st0">"cacharro"</span> <span class="sy0">:</span> <span class="st0">"tv"</span><span class="sy0">,</span>
+    <span class="st0">"pulgadas"</span> <span class="sy0">:</span> <span class="nu0">50</span><span class="sy0">,</span>
+    <span class="st0">"unidades"</span> <span class="sy0">:</span> <span class="nu0">20</span>
+<span class="br0">}</span>
+&nbsp;</pre>
+
+<br>
+A partir de la versión 3.2 existe la posibilidad de hacer todas las operaciones de forma simultánea. Vamos a ver el siguiente ejemplo timando del manual de MongoDB:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"> db.<span class="me1">characters</span>.<span class="me1">bulkWrite</span><span class="br0">(</span>
+      <span class="br0">[</span>
+         <span class="br0">{</span> insertOne <span class="sy0">:</span>
+            <span class="br0">{</span>
+               <span class="st0">"document"</span> <span class="sy0">:</span>
+               <span class="br0">{</span>
+                  <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">4</span><span class="sy0">,</span> <span class="st0">"char"</span> <span class="sy0">:</span> <span class="st0">"Dithras"</span><span class="sy0">,</span> <span class="st0">"class"</span> <span class="sy0">:</span> <span class="st0">"barbarian"</span><span class="sy0">,</span> <span class="st0">"lvl"</span> <span class="sy0">:</span> <span class="nu0">4</span>
+               <span class="br0">}</span>
+            <span class="br0">}</span>
+         <span class="br0">}</span><span class="sy0">,</span>
+         <span class="br0">{</span> insertOne <span class="sy0">:</span>
+            <span class="br0">{</span>
+               <span class="st0">"document"</span> <span class="sy0">:</span>
+               <span class="br0">{</span>
+                  <span class="st0">"_id"</span> <span class="sy0">:</span> <span class="nu0">5</span><span class="sy0">,</span> <span class="st0">"char"</span> <span class="sy0">:</span> <span class="st0">"Taeln"</span><span class="sy0">,</span> <span class="st0">"class"</span> <span class="sy0">:</span> <span class="st0">"fighter"</span><span class="sy0">,</span> <span class="st0">"lvl"</span> <span class="sy0">:</span> <span class="nu0">3</span>
+               <span class="br0">}</span>
+            <span class="br0">}</span>
+         <span class="br0">}</span><span class="sy0">,</span>
+         <span class="br0">{</span> updateOne <span class="sy0">:</span>
+            <span class="br0">{</span>
+               <span class="st0">"filter"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"char"</span> <span class="sy0">:</span> <span class="st0">"Eldon"</span> <span class="br0">}</span><span class="sy0">,</span>
+               <span class="st0">"update"</span> <span class="sy0">:</span> <span class="br0">{</span> $set <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"status"</span> <span class="sy0">:</span> <span class="st0">"Critical Injury"</span> <span class="br0">}</span> <span class="br0">}</span>
+            <span class="br0">}</span>
+         <span class="br0">}</span><span class="sy0">,</span>
+         <span class="br0">{</span> deleteOne <span class="sy0">:</span>
+            <span class="br0">{</span> <span class="st0">"filter"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"char"</span> <span class="sy0">:</span> <span class="st0">"Brisbane"</span><span class="br0">}</span> <span class="br0">}</span>
+         <span class="br0">}</span><span class="sy0">,</span>
+         <span class="br0">{</span> replaceOne <span class="sy0">:</span>
+            <span class="br0">{</span>
+               <span class="st0">"filter"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"char"</span> <span class="sy0">:</span> <span class="st0">"Meldane"</span> <span class="br0">}</span><span class="sy0">,</span>
+               <span class="st0">"replacement"</span> <span class="sy0">:</span> <span class="br0">{</span> <span class="st0">"char"</span> <span class="sy0">:</span> <span class="st0">"Tanys"</span><span class="sy0">,</span> <span class="st0">"class"</span> <span class="sy0">:</span> <span class="st0">"oracle"</span><span class="sy0">,</span> <span class="st0">"lvl"</span> <span class="sy0">:</span> <span class="nu0">4</span> <span class="br0">}</span>
+            <span class="br0">}</span>
+         <span class="br0">}</span>
+      <span class="br0">]</span>
+   <span class="br0">)</span></pre>
+
+<br>
+<br>
+<br>
+<h1 id="toc36"><a name="Diseño de colecciones"></a>Diseño de colecciones</h1>
+ <br>
+(Esta sección está sin desarrollar, lo haremos en clase)<br>
+Para obtener buenos resultados en las operaciones CRUD es importante tener un buen diseño de la base de datos. Hay que considerar los casos:<br>
+<br>
+<ul><li>Relaciónes 1 a 1. Por ejemplo Estudiantes -&gt; expediente</li><li>Relaciones uno a muchos. Por ejemplo estudiantes UCM -&gt; facultad</li><li>Relaciones muchos a muchos. Ej.: profesores &lt;-&gt; estudiantes</li></ul><br>
+MongoDB tiende a favorecer los datos empotrados, lo que es conveniente desde el punto de vista de eficiencia.<br>
+Si ha que hacer joins se suelen hacer dentro de un lenguaje, por eso veremos pymongo.<br>
+<br>
+<hr>
+<ul class="quotelist"><li><strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>¿Cómo representar un árbol en MongoDB?</li></ul><hr>
+<br>
+<br>
+<hr>
+<ul class="quotelist"><li><br>
+</li><li><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span>Consideramos un e-comercio deportivo, que tiene una colección categories en forma de árbol dividiendo los productos según el deporte. Uno de sus documentos es:</li></ul>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span>
+&nbsp;
+_id<span class="sy0">:</span> <span class="nu0">34</span><span class="sy0">,</span>
+&nbsp;
+<span class="kw3">name</span> <span class="sy0">:</span> <span class="st0">"Snorkeling"</span><span class="sy0">,</span>
+&nbsp;
+parent_id<span class="sy0">:</span> <span class="nu0">12</span><span class="sy0">,</span>
+&nbsp;
+ancestors<span class="sy0">:</span> <span class="br0">[</span><span class="nu0">12</span><span class="sy0">,</span> <span class="nu0">35</span><span class="sy0">,</span> <span class="nu0">90</span><span class="br0">]</span>
+<span class="br0">}</span></pre>
+
+<br>
+¿Qué consulta escribirías para encontrar todos los descendientes de este documento en el árbol? (se supone que tenemos el documento "delante", es decir podemos usar su información directamente.<br>
+<hr>
+<br>
+<h1 id="toc37"><a name="Colecciones trucancadas"></a>Colecciones truncadas</h1>
+ <br>
+Se trata de un tipo particular de colecciones que tienen un tamaño máximo desde su creación. Cuando se alcanza el tamaño máximo se reescribe el documento más antiguo. De esta forma se tiene un comportamiento "circular":<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">db.<span class="me1">createCollection</span><span class="br0">(</span><span class="st0">"log"</span><span class="sy0">,</span> <span class="br0">{</span> capped <span class="sy0">:</span> <span class="kw2">true</span><span class="sy0">,</span> size <span class="sy0">:</span> <span class="nu0">5242880</span><span class="sy0">,</span> max <span class="sy0">:</span> <span class="nu0">5000</span> <span class="br0">}</span> <span class="br0">)</span>
+&nbsp;
+&nbsp;</pre>
+
+En este caso se especifica el tamaño máximo y el número de documentos máximo.<br>
+<br>
+<hr>
+<br>
+<img src="./MongoDB - CRUD_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: El parámetro <em>max</em> se puede omitir, pero <em>size</em> es obligatorio. Para conocer el tamaño BSON de un documento x en el shell -y calcular mejor el número de documentos y tamaño máximo, podemos hacer
+<i>Object.bsonsize(x)</i>
+<br>
+<br>
+
+
+<hr>
+<br>
+Son colecciones muy útiles para hacer inserciones rápidas, por ejemplo para información de logs. <br>
+<br>
+<br>
+<hr>
+<br>
+<img src="./MongoDB - CRUD_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: Limitaciones: <br>
+<ol><li>No se pueden borrar documentos individuales, sí se puede borrar la colección completa con drop(), como en cualquier colección</li><li>No admiten sharding</li><li>No pueden ser colecciones de salida de agregaciones (out)</li></ol><hr>
+<br>
+<br>
+<br>
+<hr>
+<br>
+
+<a class="wiki_link" href="http://gpd.sip.ucm.es/rafa/docencia/nosql/index.html">Volver a la página principal de los apuntes de MongoDB</a>
+    </div>
+  
+
+</div></body></html>

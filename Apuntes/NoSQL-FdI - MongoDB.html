@@ -1,0 +1,765 @@
+
+<!-- saved from url=(0052)http://gpd.sip.ucm.es/rafa/docencia/nosql/shell.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>NoSQL-FdI - MongoDB</title>
+      
+
+    <link rel="stylesheet" href="./NoSQL-FdI - MongoDB_files/style.css" type="text/css">
+    
+<link id="avast_os_ext_custom_font" href="chrome-extension://eofcbnmajmjmplflapaojjnihcjkigck/common/ui/fonts/fonts.css" rel="stylesheet" type="text/css"></head>
+
+<body style="background-color: rgb(255, 255, 255);" link="#000099">
+<b><font size="-1"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/index.html"><img src="./NoSQL-FdI - MongoDB_files/nosqllogo.png" width="60"> Bases de Datos NoSQL - RafaC - 2018/2019</a></font>
+</b> <br>
+
+
+<h2 id="toc0"> </h2>
+ <img src="https://gpd.sip.ucm.es/rafa/docencia/images/logo-mongodb-tagline.png" alt="external image logo-mongodb-tagline.png" title="external image logo-mongodb-tagline.png"><br>
+<h1 id="toc2"> </h1>
+ Aunque iniciada como proyecto en 2007, MongoDB como producto fue lanzada en 2009.<br>
+<br>
+<h1 id="toc3"><a name="Características"></a>Características</h1>
+ <br>
+<ul><li>Base de datos orientada a documentos</li><li>El código fuente está publicado bajo código abierto <a class="wiki_link_ext" href="https://es.wikipedia.org/wiki/AGPL" rel="nofollow">AGPL</a></li><li>Almacena documentos en formato JSON. También utiliza este formato para consultas.</li>
+<li>Según <a class="wiki_link_ext" href="http://db-engines.com/en/ranking" rel="nofollow">este ranking</a> y en el momento de escribir estas líneas es la base de datos NoSQL
+más utilizada y la quinta en total, tras Oracle, MySQL, SQL Server y PostgreSQL. </li></ul><br>
+A diferencia del modelo relacional, en MongoDB no tenemos que definir el esquema de datos a priori. Como ya sabemos cada documento en una colección puede tener su propio esquema, pero en la práctica los documentos tienen unas cuantas posibles formas, y debemos pensarlas desde un principio. En particular debemos preocuparnos por el acceso a los datos, ya que los joins no son fáciles en MongoDB, no hay foreign keys, etc.<br>
+<br>
+<hr>
+
+<h1 id="toc4"><a name="Limitaciones"></a>Limitaciones</h1>
+ <br>
+<ul><li>Operaciones de mezcla de colecciones (JOINS): difíciles, aunque posibles especialmente usando el operador <a class="wiki_link_ext" href="https://docs.mongodb.org/master/reference/operator/aggregation/lookup/#pipe._S_lookup" rel="nofollow" target="_blank">$lookup</a><br>
+<br>
+</li><li>Transacciones: MongoDB no tiene el concepto de transacción, tan habitual en los sistemas relacionales. Hablando en modo informal, una transacción es un grupo de operaciones (borrado, inserciones, modificación) en distintas tablas/colecciones que se agrupan de forma atómica, es decir o se realizan todas o no se realiza ninguna (por ejemplo si una falla). Es decir, no puede quedar a medias. El ejemplo típo es un traspaso entre dos cuentas de banco: se resta dinero del saldo de una y esa misma cantidad se añade en otra cuenta. Si no aseguramos atomicidad, puede pasar por ejemplo, que quitemos dinero de una cuenta, haya un error al añadir en la segunda y ... ¡el dinero ha volado!</li><li>Agregaciones: El mecanismo para hacer consultas agrupadas es lento comparado con otras propuestas como Hadoop</li></ul><hr>
+<br>
+<br>
+
+
+
+<h1 id="toc3"><a name="Características"></a>Shell</h1>
+    <div class="wiki" id="content_view" style="display: block;">
+Vamos a manejar un poco el shell con sus principales comandos. Antes de empezar, es una buena idea crearse un directorio de datos, digamos con con nombre "data". Allí se grabarán los datos de nuestras colecciones.<br>
+<br>
+Entonces podemos configurar el demonio (el programa que se encarga de los accesos y transferencia de datos en un servidor) indicando que los datos van a alojarse allí<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">mkdir data
+mongod --dbpath data</pre>
+
+<br>
+En<a class="wiki_link_ext" href="https://docs.mongodb.org/v3.0/reference/program/mongod/" rel="nofollow"> h</a><span class="wiki_link_ext"><a class="wiki_link_ext" href="https://docs.mongodb.org/v3.0/reference/program/mongod/" rel="nofollow">ttps://docs.mongodb.org/v3.0/reference/program/mongod/</a></span> se puede encontrar una lista completa de los parámetros que admite el demonio mongod. De momento, al invocarlo así, nos dejará bloqeado el terminal; ya veremos como hacer para que esto no suceda.<br>
+<br>
+<br>
+<hr>
+<img src="./NoSQL-FdI - MongoDB_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: Si la invocación a mongod da un error puede ser que no lo tengamos en el PATH de neustro sistema, o que ya esté corriendo porque haya arrancado con el sistema. Si es el caso podemos "matarlo" así:<br>
+<ul><li>Linux:<br>
+sudo service mongod stop</li><li>Mac: buscar el pid y acabar el proceso con kill -9 &lt;PID&gt;</li><li>Windows:<br>
+net stop MongoDB</li></ul><br>
+¡Cuidado con esta forma de acabar con el servidor, porque pueden perderse datos!<br>
+<hr>
+<br>
+<br>
+Ahora ya podemos entrar en el shell, tecleando desde la consola<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">mongo</pre>
+
+<br>
+<br>
+<hr>
+<strong><img src="./NoSQL-FdI - MongoDB_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>mongod es el programa que actúa directamente sobre la base de datos. Está a la escucha en un puerto TCP (por defecto 27017). Podemos acceder a mongod de diversas formas:<br>
+<ul><li>Desde el shell mongo</li><li>Desde Python, usando la librería pymongo</li><li>Desde Java</li><li>...</li></ul>En cada momento puede haver varios clientes conectados a la misma instancia mongod por el mismo puerto.<br>
+<hr>
+<br>
+<br>
+Si todo va bien el shell conectará a la base de datos test:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">MongoDB shell version: 2.6.10
+connecting to: test
+Welcome to the MongoDB shell.</pre>
+
+<br>
+En todo momento podemos ver a qué base de datos estamos conectados:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span>db
+test</pre>
+
+<hr>
+<strong><img src="./NoSQL-FdI - MongoDB_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>El objeto "db" representa una conexión con la base de datos actual. Vamos a utilizarlo mucho a partir de ahora.<br>
+<hr>
+<br>
+Y cambiar la base de datos activa (que se creará si no existe)<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span><span class="kw2">use</span> pruebas
+switched to db pruebas</pre>
+
+Podemos ver la lista de bases de datos con el comando <em>show</em>:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> show dbs
+admin  <span class="br0">(</span>empty<span class="br0">)</span>
+local  0.078GB
+test   0.078GB</pre>
+
+<br>
+<em>show</em> también permite ver la lista de colecciones, usuarios, perfiles, loggers etc.<br>
+<br>
+Como hemos dicho en el tema anterio el shell es un programa en javascript. En particular nos permite evaluar expresiones:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> <span class="nu0">2</span><span class="sy0">*</span><span class="nu0">4</span><span class="sy0">+</span><span class="nu0">6</span>
+<span class="nu0">14</span></pre>
+
+<br>
+Para salir de la shell teclearemos quit()<br>
+<br>
+Recordamos también que en el shell podemos crear documentos JSON sobre la marcha, y asignárselos a variables<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="sy0">&gt;</span> a <span class="sy0">=</span> <span class="br0">{</span>nombre<span class="sy0">:</span><span class="st0">"bertoldo"</span><span class="sy0">,</span> aficiones<span class="sy0">:</span><span class="br0">[</span><span class="st0">"cria de insectos"</span><span class="sy0">,</span><span class="st0">"filatelia"</span><span class="br0">]</span><span class="sy0">,</span>
+       direccion<span class="sy0">:</span><span class="br0">{</span>calle<span class="sy0">:</span><span class="st0">"jazmin"</span><span class="sy0">,</span> num<span class="sy0">:</span><span class="nu0">3.14</span><span class="br0">}</span><span class="br0">}</span></pre>
+
+El terminal contesta mostrándonos el documento en formato "pretty":<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span>
+    <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"bertoldo"</span><span class="sy0">,</span>
+    <span class="st0">"aficiones"</span> <span class="sy0">:</span> <span class="br0">[</span>
+        <span class="st0">"cria de insectos"</span><span class="sy0">,</span>
+        <span class="st0">"filatelia"</span>
+    <span class="br0">]</span><span class="sy0">,</span>
+    <span class="st0">"direccion"</span> <span class="sy0">:</span> <span class="br0">{</span>
+        <span class="st0">"calle"</span> <span class="sy0">:</span> <span class="st0">"jazmin"</span><span class="sy0">,</span>
+        <span class="st0">"num"</span> <span class="sy0">:</span> <span class="nu0">3.14</span>
+    <span class="br0">}</span>
+<span class="br0">}</span>
+&nbsp;</pre>
+
+<br>
+<br>
+En ocasiones nos puede interesar saber el tamaño del documento (lo que ocupará en formato BSON):<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">Object.<span class="me1">bsonsize</span><span class="br0">(</span>x<span class="br0">)</span>
+<span class="nu0">320</span></pre>
+
+<br>
+<br>
+<br>
+Podemos elegir la base de datos que queremos usar directamente la linea de comandos, al llamar al cliente mongo.<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text"> mongo banco</pre>
+
+Esto conectará a la base de datos banco, creándola si no existe.<br>
+<br>
+<hr>
+<br>
+<strong><img src="./NoSQL-FdI - MongoDB_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> <span style="color: #005a35;">Observación </span></strong>En general en MongoDB no hace falta "crear" ningún objeto (hay excepciones, claro). La primera vez que se referencia un objeto inexistente. como una base de datos o una colección, ésta se creará si hace falta.<br>
+<hr>
+<br>
+<br>
+<center>
+<img src="./NoSQL-FdI - MongoDB_files/json_logo.png" alt="external image json_logo.png" title="external image json_logo.png" style="width: 300px;"><br>
+</center>
+    <div class="wiki" id="content_view" style="display: block;">
+<div id="toc"><h1 class="nopad">Contenidos</h1><div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/shell.html#Introducci%C3%B3n">Introducción</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/shell.html#Sintaxis">Sintaxis</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/shell.html#toc2"> </a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/shell.html#Tipos%20de%20datos">Tipos de datos</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/shell.html#toc4"> </a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/shell.html#Acceso%20y%20manipulaci%C3%B3n">Acceso y manipulación</a></div>
+<div style="margin-left: 1em;"><a href="http://gpd.sip.ucm.es/rafa/docencia/nosql/shell.html#Modificaci%C3%B3n%20con%20JavaScript">Modificación con JavaScript</a></div>
+</div>
+<br>
+<h1 id="toc0"><a name="Introducción"></a>Introducción</h1>
+ <br>
+MongoDB almacena los datos en <em>colecciones</em>. Una colección almacena diferentes documentos JSON, cada uno con una clave única dentro de la colección.<br>
+<br>
+<br>
+<hr>
+<strong><img src="./NoSQL-FdI - MongoDB_files/diamond.gif" alt="external image diamond.gif" title="external image diamond.gif"> Ojo:</strong> <span style="color: #005a35;">Al buscar en google, teclear JSON y no JASON :) </span><br>
+<hr>
+<br>
+JSON es el acrónimo de <strong>J</strong>ava<strong>S</strong>cript <strong>O</strong>bject <strong>N</strong>otation, un formato para la representación de documentos complejos. Existen otros formatos con propósitos similares, somo XML De hecho JSON y XML tiene muchos puntos en común:<br>
+<br>
+<ol><li>Se trata de formato basado en texto, legible por los humanos</li><li>Estructuras jerárquicas (documentos dentro de documentos, estructuras, tipo árbol)</li><li>Fácil de definir pársers, con muchas librerías en muchos lenguajes.</li><li>Ambos son admitidos en muchos contextos. Por ejemplo,el objeto de JavaScript XMLHttpRequest (que permite obtener información de una URL sin tener que cargar la página completa) admite tanto XML como JSON</li></ol><br>
+¿Cuáles son las ventajas de JSON?<br>
+<ol><li>Más legible que XML. JSON se parece mucho a las estructuras de datos utilizadas en programación.</li><li>En XML, tras definir el formato de datos hay que definir el lenguaje de consultas, por ejemplo XPath/XQuery. JSON tiene la ventaja de que el mismo formato sirve para definir los datos y (con algunas variaciones) para definir consultas.</li><li>Admite arrays, que no son permitidos directamente en XML.</li></ol><br>
+Tanto beneficio no puede venir sin un precio. Y el precio es eficiencia, sobre todo en términos de espacio en disco. 
+Para mejorar la eficiencia, JSON se representa internamente en MongoDB mediante un formato "codificado", BSON (Binar JSON) que facilita la búsqueda eficiente.<br>
+<br>
+En todo caso, para entender MongoDB primero hay conocer un poco de JSON.<br>
+<br>
+<h1 id="toc1"><a name="Sintaxis"></a>Sintaxis</h1>
+ <br>
+La representación de objetos en JSON sigue las siguientes reglas:<br>
+<br>
+<ul><li>Los objetos (documentos en lenguaje Mongo) se encierran entre { }</li><li>Los objetos pueden incluir una secuencia cualquiera de elementos separados por comas. Los elementos se escriben de la forma <strong>clave:valor</strong></li><li>Las claves son en JSON identificadores entre comillas dobles strings). En MongoDB pueden usarse comillas simples o incluso evitar las comillas si no tiene caracteres especiales ni empeia por dígito.</li><li>En cada pareja clave:valor, se tene que valor puede ser:<ul><li>Un número</li><li>Una cadena (entre comillas dobles, en el caso de Mongo y Python también se admiten comillas simples)</li><li>Un booleano: <strong>true</strong> o <strong>false</strong>.</li><li>Un array de valores, encerrados por [ ]</li><li>Un objeto (entre { })</li><li>null (no admitido en Mongo)</li></ul></li></ul><br>
+Un pequeño ejemplo nos servirá para introducir la sintaxis y las posiblidades del formato:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">x <span class="sy0">=</span> <span class="br0">{</span>
+      nombre<span class="sy0">:</span><span class="st0">"bertoldo"</span><span class="sy0">,</span>
+      calle<span class="sy0">:</span><span class="st0">"General Jamón"</span><span class="sy0">,</span>
+      num<span class="sy0">:</span><span class="nu0">256</span><span class="sy0">,</span>
+      cuentas<span class="sy0">:</span><span class="br0">[</span> <span class="br0">{</span>num<span class="sy0">:</span><span class="st0">"001"</span><span class="sy0">,</span> saldo<span class="sy0">:</span><span class="nu0">2000</span><span class="sy0">,</span> compartida<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="sy0">,</span>
+                     <span class="br0">{</span>num<span class="sy0">:</span><span class="st0">"002"</span><span class="sy0">,</span> saldo<span class="sy0">:</span><span class="nu0">100</span><span class="sy0">,</span> compartida<span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span>
+                    <span class="br0">]</span><span class="sy0">,</span>
+ datoscontacto<span class="sy0">:</span><span class="br0">{</span> email<span class="sy0">:</span><span class="st0">"bertoldo@ucm.es"</span><span class="sy0">,</span> telfs<span class="sy0">:</span><span class="br0">{</span>fijo<span class="sy0">:</span><span class="st0">"913421234"</span><span class="sy0">,</span> movil<span class="sy0">:</span><span class="br0">[</span><span class="st0">"5655555"</span><span class="sy0">,</span><span class="st0">"444444"</span><span class="br0">]</span><span class="br0">}</span> <span class="br0">}</span>
+<span class="br0">}</span></pre>
+
+<br>
+<br>
+Este documento tiene strings, enteros, arrays (cuentas) e incluso documentos anidados (datoscontacto), algo impensable en el modelo relacional,<br>
+donde tanto <em>cuentas</em> como <em>datoscontacto</em> serían tablas adicionales.<br>
+<br>
+En Mongo, todos los documentos tienen que tener un campo "_id", aunque no lo digamos explícitamente. Además los valores asociados tienen que ser diferentes, ya que _Id se usa como clave primaria.<br>
+<br>
+Obsérvese que hemos escrito nombre y no "nombre" por lo que no es correcto en JSON, aunque sí en Mongo. La pereza....<br>
+<br>
+<br>
+<hr>
+<br>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>¿Es este un documento JSON representando una lista válido? ¿Por qué?<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="br0">{</span><span class="st0">"nodo"</span><span class="sy0">:</span><span class="nu0">2</span><span class="sy0">,</span> hijo1<span class="sy0">:</span><span class="br0">{</span>nodo<span class="sy0">:</span><span class="br0">[</span><span class="nu0">3</span><span class="sy0">,</span><span class="nu0">4</span><span class="br0">]</span><span class="br0">}</span><span class="sy0">,</span> hijo2<span class="sy0">:</span><span class="br0">{</span>nodo<span class="sy0">:</span><span class="br0">{</span><span class="kw2">true</span><span class="br0">}</span><span class="br0">}</span> <span class="br0">}</span></pre>
+
+<hr>
+<br>
+<h1 id="toc2"> </h1>
+ <h1 id="toc3"><a name="Tipos de datos"></a>Tipos de datos</h1>
+ <br>
+6 tipos de datos:<br>
+<br>
+<ul><li>Número: incluye enteros y decimales. también se puede usar la notación "e" para exponenciales. No incluye valores especiales como NaN.</li><li>Cadenas: Caracteres Unicode entre comillas. Se puede usar \ para introducir símbolos especiales (\n salto de línea, por ejemplo).</li><li>Booleanos: true y false.</li><li>Arrays: Una lista ordenada de cero o más valores, encerrados entre corchetes. Ej: ["bertoldo", "herminia", "aniceto"]</li><li>Documentos, también llamados objetos: una lista no ordenada de parejas clave, valor, que se escribe como clave:valor. El documento completo se escribe entre llaves, y las parejas clave:valor se separan por comas. Se aconseja escribir la clave entre comillas pero no es necesario si no contiene blancos ni caracteres especiales. Por ejemplo nombre:"bertoldo" es correcto, #:13 no es correcto, pero "#":13 sí es correcto. Se suele requerir que dentro de un documento todas las claves sean distintas (aunque el formato JSON no impone esta condición).Informalmente, podemos pensar en un documento como un arrays de asociación, un diccionario o un un tipo Maps.</li><li>null: Valor vacío, se representa con la palabra reservada null.</li></ul>Y tres tipos adicionales añadidos por Mongo:<br>
+<ul><li>Fechas, representadas en BSON como enteros de 64 bits con el número de milisegundos desde el 1de enero de 1970.</li><li>BinData: representación de datos binarios (por ejemplo una foto)</li><li>ObjectId: utilizado por BSON para representar el tipo de las claves _id.</li></ul><h1 id="toc4"> </h1>
+ <h1 id="toc5"><a name="Acceso y manipulación"></a>Acceso y manipulación</h1>
+ <br>
+Desde la consola del shell de Mongo, que está escrito en Javascript y admite Javascript embebido, podemos manejar objetos JSON (documentos a partir de ahora)<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">x <span class="sy0">=</span> <span class="br0">{</span>
+      nombre<span class="sy0">:</span><span class="st0">"bertoldo"</span><span class="sy0">,</span>
+      calle<span class="sy0">:</span><span class="st0">"General Jamón"</span><span class="sy0">,</span>
+      num<span class="sy0">:</span><span class="nu0">256</span><span class="sy0">,</span>
+      cuentas<span class="sy0">:</span><span class="br0">[</span> <span class="br0">{</span>num<span class="sy0">:</span><span class="st0">"001"</span><span class="sy0">,</span> saldo<span class="sy0">:</span><span class="nu0">2000</span><span class="sy0">,</span> compartida<span class="sy0">:</span><span class="kw2">true</span><span class="br0">}</span><span class="sy0">,</span>
+                     <span class="br0">{</span>num<span class="sy0">:</span><span class="st0">"002"</span><span class="sy0">,</span> saldo<span class="sy0">:</span><span class="nu0">100</span><span class="sy0">,</span> compartida<span class="sy0">:</span><span class="kw2">false</span><span class="br0">}</span>
+                    <span class="br0">]</span><span class="sy0">,</span>
+ datoscontacto<span class="sy0">:</span><span class="br0">{</span> email<span class="sy0">:</span><span class="st0">"bertoldo@ucm.es"</span><span class="sy0">,</span> telfs<span class="sy0">:</span><span class="br0">{</span>fijo<span class="sy0">:</span><span class="st0">"913421234"</span><span class="sy0">,</span> movil<span class="sy0">:</span><span class="br0">[</span><span class="st0">"5655555"</span><span class="sy0">,</span><span class="st0">"444444"</span><span class="br0">]</span><span class="br0">}</span> <span class="br0">}</span>
+<span class="br0">}</span></pre>
+
+<br>
+Obtenes el nombre de la persona en x:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">x.<span class="me1">nombre</span>
+&nbsp;
+bertoldo
+&nbsp;</pre>
+
+<br>
+o también:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">x["nombre"]
+&nbsp;
+bertoldo</pre>
+
+<br>
+pero no<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">x<span class="br0">[</span>nombre<span class="br0">]</span>
+<span class="nu0">2016</span><span class="sy0">-</span>02<span class="sy0">-</span>15T18<span class="sy0">:</span><span class="nu0">41</span><span class="sy0">:</span><span class="nu0">18.022</span><span class="sy0">+</span>0100 E QUERY    <span class="br0">[</span>thread1<span class="br0">]</span> ReferenceError<span class="sy0">:</span> nombre <span class="kw1">is</span> not defined <span class="sy0">:</span>
+<span class="sy0">@</span><span class="br0">(</span>shell<span class="br0">)</span><span class="sy0">:</span><span class="nu0">1</span><span class="sy0">:</span><span class="nu0">1</span></pre>
+
+<br>
+<br>
+<hr>
+<img src="./NoSQL-FdI - MongoDB_files/bee.gif" alt="external image bee.gif" title="external image bee.gif"><strong><span style="color: #0000ff;">Aviso</span></strong>: La notación x.nombre es la estándard de Mongo. Mongo también usa [ ], pero solo para acceder a los elementos de un array. La notación x["nombre"] es propia de JavaScript y por eso se admite en la consola, pero no es propia de MongoDB y nos dará error si por ejemplo la queremos usar en una consulta. Sin embargo a veces en el shell resulta cómoda (¿por qué?)<br>
+<hr>
+<br>
+Podemos profundizar en la estructura, por ejemplo para averiguar el email de la persona alojada en x:<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">x.<span class="me1">datoscontacto</span>.<span class="me1">email</span>
+  bertoldo<span class="sy0">@</span>ucm.<span class="me1">es</span>
+&nbsp;
+x<span class="br0">[</span><span class="st0">"datoscontacto"</span><span class="br0">]</span><span class="br0">[</span><span class="st0">"email"</span><span class="br0">]</span>  <span class="co1">// vale en el shell, pero es sintaxis MongoDB</span>
+  bertoldo<span class="sy0">@</span>ucm.<span class="me1">es</span>
+&nbsp;</pre>
+
+Y con [pos] acceder a arrays, donde pos=0 para la primera posición<br>
+<br>
+<hr>
+<br>
+<strong><span style="color: #005a35;"><img src="https://gpd.sip.ucm.es/rafa/docencia/images/question.png" alt="external image question.png" title="external image question.png">Pregunta. </span></strong>Devolver el segundo teléfono móvil de la persona cuyos datos se encuentran en x. Usar la representación en Mongo y en JavaScript<br>
+<hr>
+<br>
+Un comportamiento típico de MongoDB (y también de JavaScript) es que no da error aunque accedamos a campos que no existen (¿por qué esto es lógico?):<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">x.<span class="me1">apellidos</span>
+    <span class="co1">// no muestra nada...ni se queja!</span></pre>
+
+<br>
+<h1 id="toc6"><a name="Modificación con JavaScript"></a>Modificación con JavaScript</h1>
+ <br>
+La misma notación nos permite modificar los documentos:<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript">x.<span class="me1">nombre</span> <span class="sy0">=</span> <span class="st0">"Aniceto"</span>
+Aniceto
+&nbsp;
+x
+<span class="br0">{</span>
+    <span class="st0">"nombre"</span> <span class="sy0">:</span> <span class="st0">"Aniceto"</span><span class="sy0">,</span>
+    <span class="st0">"calle"</span> <span class="sy0">:</span> <span class="st0">"General Jamón"</span><span class="sy0">,</span>
+....</pre>
+
+<br>
+E incluso añadir nuevos elementos a un documento<br>
+<br>
+
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.text  {font-family:monospace;}
+.text .imp {font-weight: bold; color: red;}
+.text span.xtra { display:block; }
+
+-->
+</style><pre class="text">x.apellido = "Pedralbes" // modifica el apellido si existe, y si no lo crea
+  Pedralbes</pre>
+
+<br>
+<br>
+<br>
+Otras modificaciones más complicadas necesitan del uso de Javascript, pero en la práctica no van a hacernos falta (las haremos con consultas MongoDB, no cambiando variables en la shell).<br>
+<br>
+En todo caso nos puede venir bien saber algunas cosas sobre arrays en JavaScript:<br>
+<br>
+<ul><li>Su longitud se obtiene con array.length</li><li>Se puede añadir un elemento al final de un array con array.push(elemento)</li><li>Se pueden recorrer con bucles for:</li></ul>
+<style type="text/css"><!--
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }
+
+-->
+</style><pre class="javascript"><span class="kw2">var</span> index<span class="sy0">;</span> <span class="kw2">var</span> text<span class="sy0">=</span><span class="st0">""</span>
+<span class="kw2">var</span> fruits <span class="sy0">=</span> <span class="br0">[</span><span class="st0">"Banana"</span><span class="sy0">,</span> <span class="st0">"Orange"</span><span class="sy0">,</span> <span class="st0">"Apple"</span><span class="sy0">,</span> <span class="st0">"Mango"</span><span class="br0">]</span><span class="sy0">;</span>
+<span class="kw1">for</span> <span class="br0">(</span>index <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> index <span class="sy0">&lt;</span> fruits.<span class="me1">length</span><span class="sy0">;</span> index<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span>
+text <span class="sy0">+=</span> fruits<span class="br0">[</span>index<span class="br0">]</span><span class="sy0">;</span>
+<span class="br0">}</span></pre>
+
+<br>
+<ul><li>La función Array.isArray(x) indica si x es un array.</li><li>Para descubrir otras utilidades de Array teclear "Array." y pulsar el tabulador</li></ul><br>
+<br>
+<hr>
+<br>
+<a class="wiki_link" href="http://gpd.sip.ucm.es/rafa/docencia/nosql/index.html">Página principal MongoDB</a><br>
+<br>
+<hr>
+
+    </div>
+
+  
+
+</div></body></html>
